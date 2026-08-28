@@ -1,0 +1,34 @@
+{
+  "name": "paseo-plugin-machine-status",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Machine dashboard, open ports and Docker control inside Paseo",
+  "license": "MIT",
+  "author": "dutchakdev",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dutchakdev/paseo-plugin-machine-status.git"
+  },
+  "keywords": [
+    "paseo",
+    "paseo-plugin",
+    "monitoring",
+    "macos",
+    "docker"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@getpaseo/client": "^0.4.0",
+    "@tanstack/react-query": "^5.90.11",
+    "@types/react": "~19.2.0",
+    "react": "19.1.0",
+    "react-native": "0.81.5",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.11",
+    "zod": "^4.4.3"
+  }
+}
