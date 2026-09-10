@@ -1,6 +1,6 @@
 import os from "node:os";
-import type { MetricsSchema } from "./contracts.shared";
-import { run, tryRun } from "./exec.server";
+import type { MetricsSchema } from "../shared/contracts";
+import { run, tryRun } from "./exec";
 import type { z } from "zod";
 
 type Metrics = z.output<typeof MetricsSchema>;

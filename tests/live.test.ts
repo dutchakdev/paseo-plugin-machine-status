@@ -1,18 +1,18 @@
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { planCleanupHandler } from "../cleanup.server";
+import { planCleanupHandler } from "../server/cleanup";
 import {
   applyCleanup,
   killProcess,
   listProcesses,
   planCleanup,
   readMetrics,
-} from "../contracts.shared";
-import { readMetricsHandler } from "../metrics.server";
-import { killProcessHandler, listProcessesHandler } from "../processes.server";
-import { readServicesHandler } from "../services.server";
-import { readServices } from "../services.shared";
+} from "../shared/contracts";
+import { readMetricsHandler } from "../server/metrics";
+import { killProcessHandler, listProcessesHandler } from "../server/processes";
+import { readServicesHandler } from "../server/services";
+import { readServices } from "../shared/services";
 
 /**
  * Live checks against the machine running the suite. They never mutate anything:

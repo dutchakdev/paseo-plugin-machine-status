@@ -1,13 +1,13 @@
 import os from "node:os";
 import path from "node:path";
-import type { PluginHandlerContext } from "@getpaseo/plugin";
+import type { PluginHandlerContext } from "@getpaseo/plugin/server";
 import type { z } from "zod";
-import { describeError, run, tryRun } from "./exec.server";
-import type { explainProcess } from "./explain.shared";
-import { classify, type ProcessEvidence } from "./explain.rules";
-import { readMetricsHandler } from "./metrics.server";
-import { ancestorsOf, parseElapsedSeconds, parsePsTable, processName, type RawProcess } from "./processes.server";
-import { readServicesHandler } from "./services.server";
+import { describeError, run, tryRun } from "./exec";
+import type { explainProcess } from "../shared/explain";
+import { classify, type ProcessEvidence } from "./explain-rules";
+import { readMetricsHandler } from "./metrics";
+import { ancestorsOf, parseElapsedSeconds, parsePsTable, processName, type RawProcess } from "./processes";
+import { readServicesHandler } from "./services";
 
 type Output = z.output<typeof explainProcess.output>;
 

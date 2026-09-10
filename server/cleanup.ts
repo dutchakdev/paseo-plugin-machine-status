@@ -2,8 +2,8 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import type { z } from "zod";
-import type { applyCleanup, CleanupTargetSchema, planCleanup } from "./contracts.shared";
-import { describeError, runTolerant } from "./exec.server";
+import type { applyCleanup, CleanupTargetSchema, planCleanup } from "../shared/contracts";
+import { describeError, runTolerant } from "./exec";
 
 type CleanupTarget = z.output<typeof CleanupTargetSchema>;
 type PlanOutput = z.output<typeof planCleanup.output>;

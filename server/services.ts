@@ -1,9 +1,9 @@
 import os from "node:os";
 import path from "node:path";
-import type { PluginHandlerContext } from "@getpaseo/plugin";
+import type { PluginHandlerContext } from "@getpaseo/plugin/server";
 import type { z } from "zod";
-import { describeError, run, tryRun } from "./exec.server";
-import { ancestorsOf, parsePsTable, type RawProcess } from "./processes.server";
+import { describeError, run, tryRun } from "./exec";
+import { ancestorsOf, parsePsTable, type RawProcess } from "./processes";
 import {
   classifyRelevance,
   friendlyName,
@@ -13,8 +13,8 @@ import {
   parseNetstatAddress,
   portKey,
   scopeOf,
-} from "./services.classify";
-import type { PortRow, ServiceRow, readServices } from "./services.shared";
+} from "../shared/services-classify";
+import type { PortRow, ServiceRow, readServices } from "../shared/services";
 
 type Output = z.output<typeof readServices.output>;
 

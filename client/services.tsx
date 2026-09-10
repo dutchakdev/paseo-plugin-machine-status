@@ -1,10 +1,10 @@
-import { useRpc, type PluginSurfaceProps } from "@getpaseo/plugin";
+import { useRpc, type PluginSurfaceProps } from "@getpaseo/plugin/client";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Linking, Pressable, ScrollView, Text, View } from "react-native";
-import { readServices, type PortRow, type ServiceRow } from "./services.shared";
-import { ActionButton, Card, useChromeStyles, type Chrome } from "./ui.client";
-import { paletteFor, STATUS, type VizPalette } from "./viz.shared";
+import { readServices, type PortRow, type ServiceRow } from "../shared/services";
+import { ActionButton, Card, useChromeStyles, type Chrome } from "./ui";
+import { paletteFor, STATUS, type VizPalette } from "../shared/viz";
 
 const SOURCE_DOT: Record<ServiceRow["source"], "agent" | "plain"> = {
   agent: "agent",

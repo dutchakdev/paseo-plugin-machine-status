@@ -11,7 +11,7 @@ import {
   spanLabel,
   stackedColumn,
   takeLast,
-} from "../viz.shared";
+} from "../shared/viz";
 
 describe("relativeLuminance", () => {
   it("reads six-digit hex", () => {

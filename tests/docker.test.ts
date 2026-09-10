@@ -5,7 +5,7 @@ import {
   parseImages,
   parseReclaimed,
   parseSystemDf,
-} from "../docker.server";
+} from "../server/docker";
 
 /** Captured verbatim from this machine. */
 const PS = `82df267c4414\thl-search-pg\tpostgres:16\trunning\tUp 3 days\t0.0.0.0:5653->5432/tcp, [::]:5653->5432/tcp

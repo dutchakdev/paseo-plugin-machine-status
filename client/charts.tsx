@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { columnHeights, padSlots, paletteFor, stackedColumn, type VizPalette } from "./viz.shared";
-import { useChromeStyles, type Chrome } from "./ui.client";
+import { columnHeights, padSlots, paletteFor, stackedColumn, type VizPalette } from "../shared/viz";
+import { useChromeStyles, type Chrome } from "./ui";
 
 /**
  * React Native has no SVG and Paseo's client bundle cannot import one, so every

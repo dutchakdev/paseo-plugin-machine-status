@@ -1,0 +1,193 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="436" viewBox="0 0 980 436">
+<rect x="0" y="0" width="980" height="436" rx="14" fill="#131516"/>
+<text x="22" y="30" fill="#e8eaec" font-size="21" font-weight="700" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >macbook-m1.local</text>
+<text x="22" y="50" fill="#9aa1a6" font-size="11" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >Darwin 27.0.0 (arm64) · up 5d 11h</text>
+<text x="958" y="28" fill="#626a70" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >Live · every 3s · last 4 min</text>
+<rect x="22" y="74" width="223.5" height="128" rx="12" fill="#1a1d1f" stroke="rgba(255,255,255,0.10)"/>
+<text x="38" y="100" fill="#3987e5" font-size="11" font-weight="600" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" letter-spacing="1.2">CPU</text>
+<text x="229.5" y="100" fill="#626a70" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >8 cores</text>
+<text x="38" y="136" fill="#e8eaec" font-size="25" font-weight="700" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >2.31</text>
+<text x="101.6" y="136" fill="#9aa1a6" font-size="11" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >load, 1 min</text>
+<text x="38" y="188" fill="#9aa1a6" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >5 min 1.98 · 15 min 1.75 · OK</text>
+<rect x="38" y="169.6" width="3.8" height="8.4" rx="1" fill="#3987e5"/><rect x="42.8" y="166.2" width="3.8" height="11.8" rx="1" fill="#3987e5"/><rect x="47.6" y="163.8" width="3.8" height="14.2" rx="1" fill="#3987e5"/><rect x="52.4" y="163.1" width="3.8" height="14.9" rx="1" fill="#3987e5"/><rect x="57.1" y="163.7" width="3.8" height="14.3" rx="1" fill="#3987e5"/><rect x="61.9" y="164.9" width="3.8" height="13.1" rx="1" fill="#3987e5"/><rect x="66.7" y="165.9" width="3.8" height="12.1" rx="1" fill="#3987e5"/><rect x="71.5" y="166.3" width="3.8" height="11.7" rx="1" fill="#3987e5"/><rect x="76.3" y="166.3" width="3.8" height="11.7" rx="1" fill="#3987e5"/><rect x="81.1" y="166.7" width="3.8" height="11.3" rx="1" fill="#3987e5"/><rect x="85.9" y="168.1" width="3.8" height="9.9" rx="1" fill="#3987e5"/><rect x="90.7" y="170.6" width="3.8" height="7.4" rx="1" fill="#3987e5"/><rect x="95.4" y="173.8" width="3.8" height="4.2" rx="1" fill="#3987e5"/><rect x="100.2" y="176" width="3.8" height="2" rx="1" fill="#3987e5"/><rect x="105" y="176" width="3.8" height="2" rx="1" fill="#3987e5"/><rect x="109.8" y="176" width="3.8" height="2" rx="1" fill="#3987e5"/><rect x="114.6" y="175.1" width="3.8" height="2.9" rx="1" fill="#3987e5"/><rect x="119.4" y="172.5" width="3.8" height="5.5" rx="1" fill="#3987e5"/><rect x="124.2" y="170.4" width="3.8" height="7.6" rx="1" fill="#3987e5"/><rect x="129" y="169.2" width="3.8" height="8.8" rx="1" fill="#3987e5"/><rect x="133.8" y="168.6" width="3.8" height="9.4" rx="1" fill="#3987e5"/><rect x="138.5" y="168.2" width="3.8" height="9.8" rx="1" fill="#3987e5"/><rect x="143.3" y="167.2" width="3.8" height="10.8" rx="1" fill="#3987e5"/><rect x="148.1" y="165.4" width="3.8" height="12.6" rx="1" fill="#3987e5"/><rect x="152.9" y="163.4" width="3.8" height="14.6" rx="1" fill="#3987e5"/><rect x="157.7" y="162.1" width="3.8" height="15.9" rx="1" fill="#3987e5"/><rect x="162.5" y="162.2" width="3.8" height="15.8" rx="1" fill="#3987e5"/><rect x="167.3" y="164.2" width="3.8" height="13.8" rx="1" fill="#3987e5"/><rect x="172" y="167.4" width="3.8" height="10.6" rx="1" fill="#3987e5"/><rect x="176.8" y="170.7" width="3.8" height="7.3" rx="1" fill="#3987e5"/><rect x="181.6" y="173.2" width="3.8" height="4.8" rx="1" fill="#3987e5"/><rect x="186.4" y="174.3" width="3.8" height="3.7" rx="1" fill="#3987e5"/><rect x="191.2" y="174.3" width="3.8" height="3.7" rx="1" fill="#3987e5"/><rect x="196" y="173.8" width="3.8" height="4.2" rx="1" fill="#3987e5"/><rect x="200.8" y="173.7" width="3.8" height="4.3" rx="1" fill="#3987e5"/><rect x="205.6" y="174.1" width="3.8" height="3.9" rx="1" fill="#3987e5"/><rect x="210.3" y="174.8" width="3.8" height="3.2" rx="1" fill="#3987e5"/><rect x="215.1" y="174.8" width="3.8" height="3.2" rx="1" fill="#3987e5"/><rect x="219.9" y="173.5" width="3.8" height="4.5" rx="1" fill="#3987e5"/><rect x="224.7" y="170.8" width="3.8" height="7.2" rx="1" fill="#3987e5"/>
+<rect x="259.5" y="74" width="223.5" height="128" rx="12" fill="#1a1d1f" stroke="rgba(255,255,255,0.10)"/>
+<text x="275.5" y="100" fill="#d95926" font-size="11" font-weight="600" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" letter-spacing="1.2">MEMORY</text>
+<text x="467" y="100" fill="#626a70" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >16.0 GB</text>
+<text x="275.5" y="136" fill="#e8eaec" font-size="25" font-weight="700" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >37%</text>
+<text x="333.38" y="136" fill="#9aa1a6" font-size="11" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >pressure</text>
+<text x="275.5" y="188" fill="#9aa1a6" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >11.0 GB used · OK</text>
+<rect x="275.5" y="165.2" width="3.8" height="12.8" rx="1" fill="#d95926"/><rect x="280.3" y="166.2" width="3.8" height="11.8" rx="1" fill="#d95926"/><rect x="285.1" y="167.4" width="3.8" height="10.6" rx="1" fill="#d95926"/><rect x="289.9" y="168.4" width="3.8" height="9.6" rx="1" fill="#d95926"/><rect x="294.6" y="169" width="3.8" height="9" rx="1" fill="#d95926"/><rect x="299.4" y="169.1" width="3.8" height="8.9" rx="1" fill="#d95926"/><rect x="304.2" y="169.1" width="3.8" height="8.9" rx="1" fill="#d95926"/><rect x="309" y="169.1" width="3.8" height="8.9" rx="1" fill="#d95926"/><rect x="313.8" y="169.3" width="3.8" height="8.7" rx="1" fill="#d95926"/><rect x="318.6" y="169.6" width="3.8" height="8.4" rx="1" fill="#d95926"/><rect x="323.4" y="169.8" width="3.8" height="8.2" rx="1" fill="#d95926"/><rect x="328.2" y="169.5" width="3.8" height="8.5" rx="1" fill="#d95926"/><rect x="332.9" y="168.7" width="3.8" height="9.3" rx="1" fill="#d95926"/><rect x="337.7" y="167.5" width="3.8" height="10.5" rx="1" fill="#d95926"/><rect x="342.5" y="166.2" width="3.8" height="11.8" rx="1" fill="#d95926"/><rect x="347.3" y="165.4" width="3.8" height="12.6" rx="1" fill="#d95926"/><rect x="352.1" y="165.1" width="3.8" height="12.9" rx="1" fill="#d95926"/><rect x="356.9" y="165.3" width="3.8" height="12.7" rx="1" fill="#d95926"/><rect x="361.7" y="165.9" width="3.8" height="12.1" rx="1" fill="#d95926"/><rect x="366.5" y="166.4" width="3.8" height="11.6" rx="1" fill="#d95926"/><rect x="371.3" y="166.7" width="3.8" height="11.3" rx="1" fill="#d95926"/><rect x="376" y="166.7" width="3.8" height="11.3" rx="1" fill="#d95926"/><rect x="380.8" y="166.9" width="3.8" height="11.1" rx="1" fill="#d95926"/><rect x="385.6" y="167.3" width="3.8" height="10.7" rx="1" fill="#d95926"/><rect x="390.4" y="168.2" width="3.8" height="9.8" rx="1" fill="#d95926"/><rect x="395.2" y="169.2" width="3.8" height="8.8" rx="1" fill="#d95926"/><rect x="400" y="170.2" width="3.8" height="7.8" rx="1" fill="#d95926"/><rect x="404.8" y="170.6" width="3.8" height="7.4" rx="1" fill="#d95926"/><rect x="409.5" y="170.4" width="3.8" height="7.6" rx="1" fill="#d95926"/><rect x="414.3" y="169.6" width="3.8" height="8.4" rx="1" fill="#d95926"/><rect x="419.1" y="168.6" width="3.8" height="9.4" rx="1" fill="#d95926"/><rect x="423.9" y="167.7" width="3.8" height="10.3" rx="1" fill="#d95926"/><rect x="428.7" y="167.2" width="3.8" height="10.8" rx="1" fill="#d95926"/><rect x="433.5" y="167" width="3.8" height="11" rx="1" fill="#d95926"/><rect x="438.3" y="166.9" width="3.8" height="11.1" rx="1" fill="#d95926"/><rect x="443.1" y="166.6" width="3.8" height="11.4" rx="1" fill="#d95926"/><rect x="447.9" y="166.1" width="3.8" height="11.9" rx="1" fill="#d95926"/><rect x="452.6" y="165.5" width="3.8" height="12.5" rx="1" fill="#d95926"/><rect x="457.4" y="165" width="3.8" height="13" rx="1" fill="#d95926"/><rect x="462.2" y="165.1" width="3.8" height="12.9" rx="1" fill="#d95926"/>
+<rect x="497" y="74" width="223.5" height="128" rx="12" fill="#1a1d1f" stroke="rgba(255,255,255,0.10)"/>
+<text x="513" y="100" fill="#199e70" font-size="11" font-weight="600" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" letter-spacing="1.2">SWAP</text>
+<text x="704.5" y="100" fill="#626a70" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >2.0 GB</text>
+<text x="513" y="136" fill="#e8eaec" font-size="25" font-weight="700" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >1.2 GB</text>
+<text x="604.16" y="136" fill="#9aa1a6" font-size="11" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >in use</text>
+<text x="513" y="188" fill="#9aa1a6" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >819.2 MB free</text>
+<rect x="513" y="164.3" width="3.8" height="13.7" rx="1" fill="#199e70"/><rect x="517.8" y="164.8" width="3.8" height="13.2" rx="1" fill="#199e70"/><rect x="522.6" y="164.5" width="3.8" height="13.5" rx="1" fill="#199e70"/><rect x="527.4" y="163.7" width="3.8" height="14.3" rx="1" fill="#199e70"/><rect x="532.1" y="162.6" width="3.8" height="15.4" rx="1" fill="#199e70"/><rect x="536.9" y="161.8" width="3.8" height="16.2" rx="1" fill="#199e70"/><rect x="541.7" y="161.4" width="3.8" height="16.6" rx="1" fill="#199e70"/><rect x="546.5" y="161.2" width="3.8" height="16.8" rx="1" fill="#199e70"/><rect x="551.3" y="160.9" width="3.8" height="17.1" rx="1" fill="#199e70"/><rect x="556.1" y="160.3" width="3.8" height="17.7" rx="1" fill="#199e70"/><rect x="560.9" y="159.3" width="3.8" height="18.7" rx="1" fill="#199e70"/><rect x="565.7" y="158.3" width="3.8" height="19.7" rx="1" fill="#199e70"/><rect x="570.5" y="157.6" width="3.8" height="20.4" rx="1" fill="#199e70"/><rect x="575.2" y="157.8" width="3.8" height="20.2" rx="1" fill="#199e70"/><rect x="580" y="158.7" width="3.8" height="19.3" rx="1" fill="#199e70"/><rect x="584.8" y="160.1" width="3.8" height="17.9" rx="1" fill="#199e70"/><rect x="589.6" y="161.5" width="3.8" height="16.5" rx="1" fill="#199e70"/><rect x="594.4" y="162.6" width="3.8" height="15.4" rx="1" fill="#199e70"/><rect x="599.2" y="163" width="3.8" height="15" rx="1" fill="#199e70"/><rect x="604" y="163" width="3.8" height="15" rx="1" fill="#199e70"/><rect x="608.8" y="162.9" width="3.8" height="15.1" rx="1" fill="#199e70"/><rect x="613.5" y="163.1" width="3.8" height="14.9" rx="1" fill="#199e70"/><rect x="618.3" y="163.4" width="3.8" height="14.6" rx="1" fill="#199e70"/><rect x="623.1" y="163.8" width="3.8" height="14.2" rx="1" fill="#199e70"/><rect x="627.9" y="163.8" width="3.8" height="14.2" rx="1" fill="#199e70"/><rect x="632.7" y="163.2" width="3.8" height="14.8" rx="1" fill="#199e70"/><rect x="637.5" y="161.9" width="3.8" height="16.1" rx="1" fill="#199e70"/><rect x="642.3" y="160.3" width="3.8" height="17.7" rx="1" fill="#199e70"/><rect x="647" y="158.9" width="3.8" height="19.1" rx="1" fill="#199e70"/><rect x="651.8" y="158.1" width="3.8" height="19.9" rx="1" fill="#199e70"/><rect x="656.6" y="158.1" width="3.8" height="19.9" rx="1" fill="#199e70"/><rect x="661.4" y="158.6" width="3.8" height="19.4" rx="1" fill="#199e70"/><rect x="666.2" y="159.3" width="3.8" height="18.7" rx="1" fill="#199e70"/><rect x="671" y="159.8" width="3.8" height="18.2" rx="1" fill="#199e70"/><rect x="675.8" y="160" width="3.8" height="18" rx="1" fill="#199e70"/><rect x="680.6" y="160.1" width="3.8" height="17.9" rx="1" fill="#199e70"/><rect x="685.4" y="160.4" width="3.8" height="17.6" rx="1" fill="#199e70"/><rect x="690.1" y="161.2" width="3.8" height="16.8" rx="1" fill="#199e70"/><rect x="694.9" y="162.4" width="3.8" height="15.6" rx="1" fill="#199e70"/><rect x="699.7" y="163.7" width="3.8" height="14.3" rx="1" fill="#199e70"/>
+<rect x="734.5" y="74" width="223.5" height="128" rx="12" fill="#1a1d1f" stroke="rgba(255,255,255,0.10)"/>
+<text x="750.5" y="100" fill="#c98500" font-size="11" font-weight="600" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" letter-spacing="1.2">DISK</text>
+<text x="942" y="100" fill="#626a70" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >/</text>
+<text x="750.5" y="136" fill="#e8eaec" font-size="25" font-weight="700" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >15%</text>
+<text x="808.38" y="136" fill="#9aa1a6" font-size="11" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >used</text>
+<text x="750.5" y="188" fill="#9aa1a6" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >143.8 GB free</text>
+<rect x="750.5" y="162" width="191.5" height="8" rx="4" fill="#383835"/>
+<rect x="750.5" y="162" width="28.725" height="8" rx="4" fill="#c98500"/>
+<rect x="22" y="218" width="461" height="196" rx="12" fill="#1a1d1f" stroke="rgba(255,255,255,0.10)"/>
+<text x="38" y="244" fill="#9aa1a6" font-size="11" font-weight="600" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" letter-spacing="1.2">CPU LOAD OVER TIME</text>
+<text x="467" y="244" fill="#9aa1a6" font-size="11" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >29% · OK</text>
+<text x="70" y="268" fill="#626a70" font-size="9" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >100%</text>
+<line x1="78" y1="264" x2="467" y2="264" stroke="#2c2c2a"/>
+<text x="70" y="322" fill="#626a70" font-size="9" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >50%</text>
+<line x1="78" y1="318" x2="467" y2="318" stroke="#2c2c2a" stroke-dasharray="4 4"/>
+<text x="70" y="376" fill="#626a70" font-size="9" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >0%</text>
+<line x1="78" y1="372" x2="467" y2="372" stroke="#2c2c2a"/>
+<rect x="78" y="335.3" width="3.3" height="36.7" rx="1" fill="#3987e5"/><rect x="82.3" y="319.7" width="3.3" height="52.3" rx="1" fill="#3987e5"/><rect x="86.6" y="309" width="3.3" height="63" rx="1" fill="#3987e5"/><rect x="91" y="305.6" width="3.3" height="66.4" rx="1" fill="#3987e5"/><rect x="95.3" y="308.4" width="3.3" height="63.6" rx="1" fill="#3987e5"/><rect x="99.6" y="313.9" width="3.3" height="58.1" rx="1" fill="#3987e5"/><rect x="103.9" y="318.4" width="3.3" height="53.6" rx="1" fill="#3987e5"/><rect x="108.3" y="320.1" width="3.3" height="51.9" rx="1" fill="#3987e5"/><rect x="112.6" y="320.2" width="3.3" height="51.8" rx="1" fill="#3987e5"/><rect x="116.9" y="321.9" width="3.3" height="50.1" rx="1" fill="#3987e5"/><rect x="121.2" y="328.3" width="3.3" height="43.7" rx="1" fill="#3987e5"/><rect x="125.5" y="339.9" width="3.3" height="32.1" rx="1" fill="#3987e5"/><rect x="129.9" y="354.2" width="3.3" height="17.8" rx="1" fill="#3987e5"/><rect x="134.2" y="366.5" width="3.3" height="5.5" rx="1" fill="#3987e5"/><rect x="138.5" y="370" width="3.3" height="2" rx="1" fill="#3987e5"/><rect x="142.8" y="369.6" width="3.3" height="2.4" rx="1" fill="#3987e5"/><rect x="147.2" y="360.3" width="3.3" height="11.7" rx="1" fill="#3987e5"/><rect x="151.5" y="348.6" width="3.3" height="23.4" rx="1" fill="#3987e5"/><rect x="155.8" y="338.8" width="3.3" height="33.2" rx="1" fill="#3987e5"/><rect x="160.1" y="333.2" width="3.3" height="38.8" rx="1" fill="#3987e5"/><rect x="164.4" y="330.9" width="3.3" height="41.1" rx="1" fill="#3987e5"/><rect x="168.8" y="328.9" width="3.3" height="43.1" rx="1" fill="#3987e5"/><rect x="173.1" y="324.2" width="3.3" height="47.8" rx="1" fill="#3987e5"/><rect x="177.4" y="316.1" width="3.3" height="55.9" rx="1" fill="#3987e5"/><rect x="181.7" y="306.9" width="3.3" height="65.1" rx="1" fill="#3987e5"/><rect x="186.1" y="300.9" width="3.3" height="71.1" rx="1" fill="#3987e5"/><rect x="190.4" y="301.7" width="3.3" height="70.3" rx="1" fill="#3987e5"/><rect x="194.7" y="310.6" width="3.3" height="61.4" rx="1" fill="#3987e5"/><rect x="199" y="325.1" width="3.3" height="46.9" rx="1" fill="#3987e5"/><rect x="203.3" y="340.3" width="3.3" height="31.7" rx="1" fill="#3987e5"/><rect x="207.7" y="351.6" width="3.3" height="20.4" rx="1" fill="#3987e5"/><rect x="212" y="356.8" width="3.3" height="15.2" rx="1" fill="#3987e5"/><rect x="216.3" y="356.6" width="3.3" height="15.4" rx="1" fill="#3987e5"/><rect x="220.6" y="354.6" width="3.3" height="17.4" rx="1" fill="#3987e5"/><rect x="225" y="354" width="3.3" height="18" rx="1" fill="#3987e5"/><rect x="229.3" y="356" width="3.3" height="16" rx="1" fill="#3987e5"/><rect x="233.6" y="358.9" width="3.3" height="13.1" rx="1" fill="#3987e5"/><rect x="237.9" y="358.9" width="3.3" height="13.1" rx="1" fill="#3987e5"/><rect x="242.2" y="353.1" width="3.3" height="18.9" rx="1" fill="#3987e5"/><rect x="246.6" y="341" width="3.3" height="31" rx="1" fill="#3987e5"/><rect x="250.9" y="325.2" width="3.3" height="46.8" rx="1" fill="#3987e5"/><rect x="255.2" y="310.9" width="3.3" height="61.1" rx="1" fill="#3987e5"/><rect x="259.5" y="302.6" width="3.3" height="69.4" rx="1" fill="#3987e5"/><rect x="263.9" y="302.2" width="3.3" height="69.8" rx="1" fill="#3987e5"/><rect x="268.2" y="308.1" width="3.3" height="63.9" rx="1" fill="#3987e5"/><rect x="272.5" y="316.4" width="3.3" height="55.6" rx="1" fill="#3987e5"/><rect x="276.8" y="323.2" width="3.3" height="48.8" rx="1" fill="#3987e5"/><rect x="281.1" y="326.6" width="3.3" height="45.4" rx="1" fill="#3987e5"/><rect x="285.5" y="328.1" width="3.3" height="43.9" rx="1" fill="#3987e5"/><rect x="289.8" y="330.8" width="3.3" height="41.2" rx="1" fill="#3987e5"/><rect x="294.1" y="337.4" width="3.3" height="34.6" rx="1" fill="#3987e5"/><rect x="298.4" y="348.4" width="3.3" height="23.6" rx="1" fill="#3987e5"/><rect x="302.8" y="360.8" width="3.3" height="11.2" rx="1" fill="#3987e5"/><rect x="307.1" y="370" width="3.3" height="2" rx="1" fill="#3987e5"/><rect x="311.4" y="370" width="3.3" height="2" rx="1" fill="#3987e5"/><rect x="315.7" y="366.3" width="3.3" height="5.7" rx="1" fill="#3987e5"/><rect x="320" y="354.1" width="3.3" height="17.9" rx="1" fill="#3987e5"/><rect x="324.4" y="340.5" width="3.3" height="31.5" rx="1" fill="#3987e5"/><rect x="328.7" y="329.9" width="3.3" height="42.1" rx="1" fill="#3987e5"/><rect x="333" y="324.4" width="3.3" height="47.6" rx="1" fill="#3987e5"/><rect x="337.3" y="322.8" width="3.3" height="49.2" rx="1" fill="#3987e5"/><rect x="341.7" y="322" width="3.3" height="50" rx="1" fill="#3987e5"/><rect x="346" y="318.9" width="3.3" height="53.1" rx="1" fill="#3987e5"/><rect x="350.3" y="313.1" width="3.3" height="58.9" rx="1" fill="#3987e5"/><rect x="354.6" y="306.7" width="3.3" height="65.3" rx="1" fill="#3987e5"/><rect x="358.9" y="303.9" width="3.3" height="68.1" rx="1" fill="#3987e5"/><rect x="363.3" y="307.9" width="3.3" height="64.1" rx="1" fill="#3987e5"/><rect x="367.6" y="319.2" width="3.3" height="52.8" rx="1" fill="#3987e5"/><rect x="371.9" y="335" width="3.3" height="37" rx="1" fill="#3987e5"/><rect x="376.2" y="350.2" width="3.3" height="21.8" rx="1" fill="#3987e5"/><rect x="380.6" y="360.2" width="3.3" height="11.8" rx="1" fill="#3987e5"/><rect x="384.9" y="363.1" width="3.3" height="8.9" rx="1" fill="#3987e5"/><rect x="389.2" y="360.4" width="3.3" height="11.6" rx="1" fill="#3987e5"/><rect x="393.5" y="355.8" width="3.3" height="16.2" rx="1" fill="#3987e5"/><rect x="397.8" y="352.8" width="3.3" height="19.2" rx="1" fill="#3987e5"/><rect x="402.2" y="352.4" width="3.3" height="19.6" rx="1" fill="#3987e5"/><rect x="406.5" y="352.9" width="3.3" height="19.1" rx="1" fill="#3987e5"/><rect x="410.8" y="351" width="3.3" height="21" rx="1" fill="#3987e5"/><rect x="415.1" y="343.7" width="3.3" height="28.3" rx="1" fill="#3987e5"/><rect x="419.5" y="331.1" width="3.3" height="40.9" rx="1" fill="#3987e5"/><rect x="423.8" y="316.3" width="3.3" height="55.7" rx="1" fill="#3987e5"/><rect x="428.1" y="304.1" width="3.3" height="67.9" rx="1" fill="#3987e5"/><rect x="432.4" y="298.9" width="3.3" height="73.1" rx="1" fill="#3987e5"/><rect x="436.7" y="301.8" width="3.3" height="70.2" rx="1" fill="#3987e5"/><rect x="441.1" y="310.9" width="3.3" height="61.1" rx="1" fill="#3987e5"/><rect x="445.4" y="321.7" width="3.3" height="50.3" rx="1" fill="#3987e5"/><rect x="449.7" y="330.2" width="3.3" height="41.8" rx="1" fill="#3987e5"/><rect x="454" y="334.8" width="3.3" height="37.2" rx="1" fill="#3987e5"/><rect x="458.4" y="336.8" width="3.3" height="35.2" rx="1" fill="#3987e5"/><rect x="462.7" y="339.4" width="3.3" height="32.6" rx="1" fill="#3987e5"/>
+<text x="78" y="392" fill="#626a70" font-size="9" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >last 4 min</text>
+<rect x="497" y="218" width="461" height="196" rx="12" fill="#1a1d1f" stroke="rgba(255,255,255,0.10)"/>
+<text x="513" y="244" fill="#9aa1a6" font-size="11" font-weight="600" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" letter-spacing="1.2">MEMORY OVER TIME</text>
+<text x="942" y="244" fill="#9aa1a6" font-size="11" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >11.0 GB of 16.0 GB</text>
+<text x="545" y="268" fill="#626a70" font-size="9" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >16 GB</text>
+<line x1="553" y1="264" x2="942" y2="264" stroke="#2c2c2a"/>
+<text x="545" y="322" fill="#626a70" font-size="9" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >8 GB</text>
+<line x1="553" y1="318" x2="942" y2="318" stroke="#2c2c2a" stroke-dasharray="4 4"/>
+<text x="545" y="376" fill="#626a70" font-size="9" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >0</text>
+<line x1="553" y1="372" x2="942" y2="372" stroke="#2c2c2a"/>
+<rect x="553" y="334.2" width="6.8" height="37.8" rx="0" fill="#3987e5"/>
+<rect x="553" y="319.3" width="6.8" height="14.9" rx="0" fill="#d95926"/>
+<rect x="553" y="295.8" width="6.8" height="23.5" rx="0" fill="#199e70"/>
+<rect x="561.8" y="333.6" width="6.8" height="38.4" rx="0" fill="#3987e5"/>
+<rect x="561.8" y="318.7" width="6.8" height="15" rx="0" fill="#d95926"/>
+<rect x="561.8" y="295.3" width="6.8" height="23.3" rx="0" fill="#199e70"/>
+<rect x="570.7" y="333.1" width="6.8" height="38.9" rx="0" fill="#3987e5"/>
+<rect x="570.7" y="318.1" width="6.8" height="15" rx="0" fill="#d95926"/>
+<rect x="570.7" y="295" width="6.8" height="23.1" rx="0" fill="#199e70"/>
+<rect x="579.5" y="332.7" width="6.8" height="39.3" rx="0" fill="#3987e5"/>
+<rect x="579.5" y="317.6" width="6.8" height="15" rx="0" fill="#d95926"/>
+<rect x="579.5" y="294.9" width="6.8" height="22.8" rx="0" fill="#199e70"/>
+<rect x="588.4" y="332.3" width="6.8" height="39.7" rx="0" fill="#3987e5"/>
+<rect x="588.4" y="317.3" width="6.8" height="14.9" rx="0" fill="#d95926"/>
+<rect x="588.4" y="294.9" width="6.8" height="22.5" rx="0" fill="#199e70"/>
+<rect x="597.2" y="332" width="6.8" height="40" rx="0" fill="#3987e5"/>
+<rect x="597.2" y="317.2" width="6.8" height="14.8" rx="0" fill="#d95926"/>
+<rect x="597.2" y="295.1" width="6.8" height="22.1" rx="0" fill="#199e70"/>
+<rect x="606" y="331.9" width="6.8" height="40.1" rx="0" fill="#3987e5"/>
+<rect x="606" y="317.3" width="6.8" height="14.7" rx="0" fill="#d95926"/>
+<rect x="606" y="295.4" width="6.8" height="21.8" rx="0" fill="#199e70"/>
+<rect x="614.9" y="332" width="6.8" height="40" rx="0" fill="#3987e5"/>
+<rect x="614.9" y="317.5" width="6.8" height="14.5" rx="0" fill="#d95926"/>
+<rect x="614.9" y="296" width="6.8" height="21.5" rx="0" fill="#199e70"/>
+<rect x="623.7" y="332.1" width="6.8" height="39.9" rx="0" fill="#3987e5"/>
+<rect x="623.7" y="317.8" width="6.8" height="14.3" rx="0" fill="#d95926"/>
+<rect x="623.7" y="296.6" width="6.8" height="21.3" rx="0" fill="#199e70"/>
+<rect x="632.6" y="332.4" width="6.8" height="39.6" rx="0" fill="#3987e5"/>
+<rect x="632.6" y="318.4" width="6.8" height="14.1" rx="0" fill="#d95926"/>
+<rect x="632.6" y="297.3" width="6.8" height="21.1" rx="0" fill="#199e70"/>
+<rect x="641.4" y="332.8" width="6.8" height="39.2" rx="0" fill="#3987e5"/>
+<rect x="641.4" y="319" width="6.8" height="13.9" rx="0" fill="#d95926"/>
+<rect x="641.4" y="298" width="6.8" height="21" rx="0" fill="#199e70"/>
+<rect x="650.3" y="333.3" width="6.8" height="38.7" rx="0" fill="#3987e5"/>
+<rect x="650.3" y="319.6" width="6.8" height="13.7" rx="0" fill="#d95926"/>
+<rect x="650.3" y="298.7" width="6.8" height="20.9" rx="0" fill="#199e70"/>
+<rect x="659.1" y="333.9" width="6.8" height="38.1" rx="0" fill="#3987e5"/>
+<rect x="659.1" y="320.3" width="6.8" height="13.5" rx="0" fill="#d95926"/>
+<rect x="659.1" y="299.4" width="6.8" height="21" rx="0" fill="#199e70"/>
+<rect x="667.9" y="334.4" width="6.8" height="37.6" rx="0" fill="#3987e5"/>
+<rect x="667.9" y="321" width="6.8" height="13.4" rx="0" fill="#d95926"/>
+<rect x="667.9" y="299.9" width="6.8" height="21.1" rx="0" fill="#199e70"/>
+<rect x="676.8" y="335" width="6.8" height="37" rx="0" fill="#3987e5"/>
+<rect x="676.8" y="321.7" width="6.8" height="13.3" rx="0" fill="#d95926"/>
+<rect x="676.8" y="300.3" width="6.8" height="21.3" rx="0" fill="#199e70"/>
+<rect x="685.6" y="335.5" width="6.8" height="36.5" rx="0" fill="#3987e5"/>
+<rect x="685.6" y="322.2" width="6.8" height="13.3" rx="0" fill="#d95926"/>
+<rect x="685.6" y="300.6" width="6.8" height="21.6" rx="0" fill="#199e70"/>
+<rect x="694.5" y="335.9" width="6.8" height="36.1" rx="0" fill="#3987e5"/>
+<rect x="694.5" y="322.6" width="6.8" height="13.4" rx="0" fill="#d95926"/>
+<rect x="694.5" y="300.7" width="6.8" height="21.9" rx="0" fill="#199e70"/>
+<rect x="703.3" y="336.2" width="6.8" height="35.8" rx="0" fill="#3987e5"/>
+<rect x="703.3" y="322.8" width="6.8" height="13.4" rx="0" fill="#d95926"/>
+<rect x="703.3" y="300.6" width="6.8" height="22.2" rx="0" fill="#199e70"/>
+<rect x="712.1" y="336.4" width="6.8" height="35.6" rx="0" fill="#3987e5"/>
+<rect x="712.1" y="322.8" width="6.8" height="13.6" rx="0" fill="#d95926"/>
+<rect x="712.1" y="300.3" width="6.8" height="22.6" rx="0" fill="#199e70"/>
+<rect x="721" y="336.5" width="6.8" height="35.5" rx="0" fill="#3987e5"/>
+<rect x="721" y="322.7" width="6.8" height="13.7" rx="0" fill="#d95926"/>
+<rect x="721" y="299.8" width="6.8" height="22.9" rx="0" fill="#199e70"/>
+<rect x="729.8" y="336.4" width="6.8" height="35.6" rx="0" fill="#3987e5"/>
+<rect x="729.8" y="322.4" width="6.8" height="13.9" rx="0" fill="#d95926"/>
+<rect x="729.8" y="299.3" width="6.8" height="23.2" rx="0" fill="#199e70"/>
+<rect x="738.7" y="336.1" width="6.8" height="35.9" rx="0" fill="#3987e5"/>
+<rect x="738.7" y="322" width="6.8" height="14.1" rx="0" fill="#d95926"/>
+<rect x="738.7" y="298.6" width="6.8" height="23.4" rx="0" fill="#199e70"/>
+<rect x="747.5" y="335.8" width="6.8" height="36.2" rx="0" fill="#3987e5"/>
+<rect x="747.5" y="321.4" width="6.8" height="14.4" rx="0" fill="#d95926"/>
+<rect x="747.5" y="297.9" width="6.8" height="23.5" rx="0" fill="#199e70"/>
+<rect x="756.3" y="335.4" width="6.8" height="36.6" rx="0" fill="#3987e5"/>
+<rect x="756.3" y="320.8" width="6.8" height="14.6" rx="0" fill="#d95926"/>
+<rect x="756.3" y="297.2" width="6.8" height="23.6" rx="0" fill="#199e70"/>
+<rect x="765.2" y="334.8" width="6.8" height="37.2" rx="0" fill="#3987e5"/>
+<rect x="765.2" y="320.1" width="6.8" height="14.7" rx="0" fill="#d95926"/>
+<rect x="765.2" y="296.5" width="6.8" height="23.6" rx="0" fill="#199e70"/>
+<rect x="774" y="334.3" width="6.8" height="37.7" rx="0" fill="#3987e5"/>
+<rect x="774" y="319.4" width="6.8" height="14.9" rx="0" fill="#d95926"/>
+<rect x="774" y="295.9" width="6.8" height="23.5" rx="0" fill="#199e70"/>
+<rect x="782.9" y="333.7" width="6.8" height="38.3" rx="0" fill="#3987e5"/>
+<rect x="782.9" y="318.7" width="6.8" height="15" rx="0" fill="#d95926"/>
+<rect x="782.9" y="295.4" width="6.8" height="23.3" rx="0" fill="#199e70"/>
+<rect x="791.7" y="333.2" width="6.8" height="38.8" rx="0" fill="#3987e5"/>
+<rect x="791.7" y="318.2" width="6.8" height="15" rx="0" fill="#d95926"/>
+<rect x="791.7" y="295" width="6.8" height="23.1" rx="0" fill="#199e70"/>
+<rect x="800.5" y="332.7" width="6.8" height="39.3" rx="0" fill="#3987e5"/>
+<rect x="800.5" y="317.7" width="6.8" height="15" rx="0" fill="#d95926"/>
+<rect x="800.5" y="294.9" width="6.8" height="22.8" rx="0" fill="#199e70"/>
+<rect x="809.4" y="332.3" width="6.8" height="39.7" rx="0" fill="#3987e5"/>
+<rect x="809.4" y="317.4" width="6.8" height="15" rx="0" fill="#d95926"/>
+<rect x="809.4" y="294.9" width="6.8" height="22.5" rx="0" fill="#199e70"/>
+<rect x="818.2" y="332.1" width="6.8" height="39.9" rx="0" fill="#3987e5"/>
+<rect x="818.2" y="317.2" width="6.8" height="14.9" rx="0" fill="#d95926"/>
+<rect x="818.2" y="295" width="6.8" height="22.2" rx="0" fill="#199e70"/>
+<rect x="827.1" y="331.9" width="6.8" height="40.1" rx="0" fill="#3987e5"/>
+<rect x="827.1" y="317.2" width="6.8" height="14.7" rx="0" fill="#d95926"/>
+<rect x="827.1" y="295.4" width="6.8" height="21.8" rx="0" fill="#199e70"/>
+<rect x="835.9" y="332" width="6.8" height="40" rx="0" fill="#3987e5"/>
+<rect x="835.9" y="317.4" width="6.8" height="14.5" rx="0" fill="#d95926"/>
+<rect x="835.9" y="295.9" width="6.8" height="21.5" rx="0" fill="#199e70"/>
+<rect x="844.8" y="332.1" width="6.8" height="39.9" rx="0" fill="#3987e5"/>
+<rect x="844.8" y="317.8" width="6.8" height="14.3" rx="0" fill="#d95926"/>
+<rect x="844.8" y="296.5" width="6.8" height="21.3" rx="0" fill="#199e70"/>
+<rect x="853.6" y="332.4" width="6.8" height="39.6" rx="0" fill="#3987e5"/>
+<rect x="853.6" y="318.3" width="6.8" height="14.1" rx="0" fill="#d95926"/>
+<rect x="853.6" y="297.2" width="6.8" height="21.1" rx="0" fill="#199e70"/>
+<rect x="862.4" y="332.8" width="6.8" height="39.2" rx="0" fill="#3987e5"/>
+<rect x="862.4" y="318.9" width="6.8" height="13.9" rx="0" fill="#d95926"/>
+<rect x="862.4" y="297.9" width="6.8" height="21" rx="0" fill="#199e70"/>
+<rect x="871.3" y="333.3" width="6.8" height="38.7" rx="0" fill="#3987e5"/>
+<rect x="871.3" y="319.6" width="6.8" height="13.7" rx="0" fill="#d95926"/>
+<rect x="871.3" y="298.6" width="6.8" height="20.9" rx="0" fill="#199e70"/>
+<rect x="880.1" y="333.8" width="6.8" height="38.2" rx="0" fill="#3987e5"/>
+<rect x="880.1" y="320.3" width="6.8" height="13.6" rx="0" fill="#d95926"/>
+<rect x="880.1" y="299.3" width="6.8" height="21" rx="0" fill="#199e70"/>
+<rect x="889" y="334.4" width="6.8" height="37.6" rx="0" fill="#3987e5"/>
+<rect x="889" y="320.9" width="6.8" height="13.4" rx="0" fill="#d95926"/>
+<rect x="889" y="299.8" width="6.8" height="21.1" rx="0" fill="#199e70"/>
+<rect x="897.8" y="334.9" width="6.8" height="37.1" rx="0" fill="#3987e5"/>
+<rect x="897.8" y="321.6" width="6.8" height="13.4" rx="0" fill="#d95926"/>
+<rect x="897.8" y="300.3" width="6.8" height="21.3" rx="0" fill="#199e70"/>
+<rect x="906.6" y="335.4" width="6.8" height="36.6" rx="0" fill="#3987e5"/>
+<rect x="906.6" y="322.1" width="6.8" height="13.3" rx="0" fill="#d95926"/>
+<rect x="906.6" y="300.6" width="6.8" height="21.6" rx="0" fill="#199e70"/>
+<rect x="915.5" y="335.9" width="6.8" height="36.1" rx="0" fill="#3987e5"/>
+<rect x="915.5" y="322.5" width="6.8" height="13.4" rx="0" fill="#d95926"/>
+<rect x="915.5" y="300.7" width="6.8" height="21.9" rx="0" fill="#199e70"/>
+<rect x="924.3" y="336.2" width="6.8" height="35.8" rx="0" fill="#3987e5"/>
+<rect x="924.3" y="322.8" width="6.8" height="13.4" rx="0" fill="#d95926"/>
+<rect x="924.3" y="300.6" width="6.8" height="22.2" rx="0" fill="#199e70"/>
+<rect x="933.2" y="336.4" width="6.8" height="35.6" rx="0" fill="#3987e5"/>
+<rect x="933.2" y="322.8" width="6.8" height="13.6" rx="0" fill="#d95926"/>
+<rect x="933.2" y="300.3" width="6.8" height="22.5" rx="0" fill="#199e70"/>
+<rect x="553" y="384" width="8" height="8" rx="2" fill="#3987e5"/>
+<text x="566" y="392" fill="#9aa1a6" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >App 5.6 GB</text>
+<rect x="635" y="384" width="8" height="8" rx="2" fill="#d95926"/>
+<text x="648" y="392" fill="#9aa1a6" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >Wired 2.1 GB</text>
+<rect x="725" y="384" width="8" height="8" rx="2" fill="#199e70"/>
+<text x="738" y="392" fill="#9aa1a6" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >Compressed 3.3 GB</text>
+</svg>

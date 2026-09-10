@@ -8,7 +8,7 @@ import {
   sortEntries,
   toEntries,
   type RawProcess,
-} from "../processes.server";
+} from "../server/processes";
 
 /** Captured verbatim from `ps -Ao pid=,ppid=,pcpu=,rss=,comm=` on macOS. */
 const PS_OUTPUT = `  965     1  42.2  41056 /Applications/BetterDisplay.app/Contents/MacOS/BetterDisplay

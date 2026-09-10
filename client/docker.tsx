@@ -1,4 +1,4 @@
-import { useRpc, type PluginSurfaceProps } from "@getpaseo/plugin";
+import { useRpc, type PluginSurfaceProps } from "@getpaseo/plugin/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useRef, useState } from "react";
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -11,11 +11,11 @@ import {
   removeImage,
   type DockerContainer,
   type DockerImage,
-} from "./docker.shared";
-import { formatBytes } from "./format.shared";
-import { contextMenuTriggers, useContextMenu, type ContextMenuItem } from "./menu.client";
-import { Card, MetricRow, useChromeStyles, type Chrome } from "./ui.client";
-import { paletteFor, STATUS, type VizPalette } from "./viz.shared";
+} from "../shared/docker";
+import { formatBytes } from "../shared/format";
+import { contextMenuTriggers, useContextMenu, type ContextMenuItem } from "./menu";
+import { Card, MetricRow, useChromeStyles, type Chrome } from "./ui";
+import { paletteFor, STATUS, type VizPalette } from "../shared/viz";
 
 export function DockerTab({ theme, layout, host }: PluginSurfaceProps) {
   const chrome: Chrome = { theme, compact: layout.compact };

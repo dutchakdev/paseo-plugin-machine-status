@@ -1,7 +1,7 @@
 import path from "node:path";
 import type { z } from "zod";
-import type { killProcess, listProcesses, ProcessSchema } from "./contracts.shared";
-import { describeError, run } from "./exec.server";
+import type { killProcess, listProcesses, ProcessSchema } from "../shared/contracts";
+import { describeError, run } from "./exec";
 
 type ProcessEntry = z.output<typeof ProcessSchema>;
 type ListInput = z.output<typeof listProcesses.input>;

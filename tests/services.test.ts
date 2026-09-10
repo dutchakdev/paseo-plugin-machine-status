@@ -7,7 +7,7 @@ import {
   parseDockerPs,
   parseLsofSockets,
   parseNetstatListeners,
-} from "../services.server";
+} from "../server/services";
 import {
   classifyRelevance,
   executableName,
@@ -18,8 +18,8 @@ import {
   parseNetstatAddress,
   portKey,
   scopeOf,
-} from "../services.shared";
-import type { RawProcess } from "../processes.server";
+} from "../shared/services";
+import type { RawProcess } from "../server/processes";
 
 /** Captured verbatim from this machine. */
 const NETSTAT = `Active Internet connections (including servers)

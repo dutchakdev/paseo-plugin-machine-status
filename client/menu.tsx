@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef, useState } from "react";
 import { Platform, Pressable, StyleSheet, Text, View, type GestureResponderEvent } from "react-native";
-import { useChromeStyles, type Chrome } from "./ui.client";
-import { paletteFor } from "./viz.shared";
+import { useChromeStyles, type Chrome } from "./ui";
+import { paletteFor } from "../shared/viz";
 
 /**
  * A floating context menu, opened by right-click on desktop and by long-press on

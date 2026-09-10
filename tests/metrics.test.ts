@@ -12,7 +12,7 @@ import {
   resetHistory,
   summarizeHistory,
   toHistorySample,
-} from "../metrics.server";
+} from "../server/metrics";
 
 /** Captured verbatim from macOS 27 on Apple Silicon. */
 const VM_STAT = `Mach Virtual Memory Statistics: (page size of 16384 bytes)

@@ -1,8 +1,8 @@
 import type { PluginTheme } from "@getpaseo/plugin";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
-import { clampPercent } from "./format.shared";
-import { paletteFor } from "./viz.shared";
+import { clampPercent } from "../shared/format";
+import { paletteFor } from "../shared/viz";
 
 /**
  * Paseo exposes six colour tokens and a compact flag. Everything in this file is

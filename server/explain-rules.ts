@@ -1,4 +1,4 @@
-import type { Explanation } from "./explain.shared";
+import type { Explanation } from "../shared/explain";
 
 /**
  * Turns gathered evidence into a verdict.

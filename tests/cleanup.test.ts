@@ -2,7 +2,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { assertSafePath, emptyDirectory } from "../cleanup.server";
+import { assertSafePath, emptyDirectory } from "../server/cleanup";
 
 /**
  * These tests exercise the guard that stands between the plugin and `fs.rm`.

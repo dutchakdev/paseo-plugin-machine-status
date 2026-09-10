@@ -1,11 +1,11 @@
-import { useRpc } from "@getpaseo/plugin";
+import { useRpc } from "@getpaseo/plugin/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { applyCleanup, planCleanup, type CleanupTarget } from "./contracts.shared";
-import { formatBytes } from "./format.shared";
-import { ActionButton, Card, useArmedConfirm, useChromeStyles, type Chrome } from "./ui.client";
-import { paletteFor } from "./viz.shared";
+import { applyCleanup, planCleanup, type CleanupTarget } from "../shared/contracts";
+import { formatBytes } from "../shared/format";
+import { ActionButton, Card, useArmedConfirm, useChromeStyles, type Chrome } from "./ui";
+import { paletteFor } from "../shared/viz";
 
 /**
  * Scanning walks real directories with `du`, so it never runs on a timer — only

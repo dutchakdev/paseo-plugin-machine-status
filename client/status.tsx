@@ -1,23 +1,23 @@
-import { useRpc, type PluginSurfaceProps } from "@getpaseo/plugin";
+import { useRpc, type PluginSurfaceProps } from "@getpaseo/plugin/client";
 import { useQuery } from "@tanstack/react-query";
 import React, { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { ColumnChart, Legend, Meter, Sparkbars, StackedColumnChart, StatTile } from "./charts.client";
-import { ServicesTab } from "./services.client";
-import { CleanupSection } from "./cleanup.client";
-import { DockerTab } from "./docker.client";
-import { ContextMenuProvider } from "./menu.client";
-import { readMetrics, type Metrics } from "./contracts.shared";
-import { formatBytes, formatDuration, formatMinutes, formatPercent } from "./format.shared";
-import { ProcessesSection } from "./processes.client";
-import { ActionButton, Card, MetricRow, useChromeStyles, type Chrome } from "./ui.client";
+import { ColumnChart, Legend, Meter, Sparkbars, StackedColumnChart, StatTile } from "./charts";
+import { ServicesTab } from "./services";
+import { CleanupSection } from "./cleanup";
+import { DockerTab } from "./docker";
+import { ContextMenuProvider } from "./menu";
+import { readMetrics, type Metrics } from "../shared/contracts";
+import { formatBytes, formatDuration, formatMinutes, formatPercent } from "../shared/format";
+import { ProcessesSection } from "./processes";
+import { ActionButton, Card, MetricRow, useChromeStyles, type Chrome } from "./ui";
 import {
   paletteFor,
   SEVERITY_LABEL,
   severityOf,
   spanLabel,
   STATUS,
-} from "./viz.shared";
+} from "../shared/viz";
 
 type Expanded = "cpu" | "memory" | "swap" | "disk" | null;
 

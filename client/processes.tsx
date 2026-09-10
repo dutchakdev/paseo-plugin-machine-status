@@ -1,13 +1,13 @@
-import { useRpc } from "@getpaseo/plugin";
+import { useRpc } from "@getpaseo/plugin/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import React, { useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { killProcess, listProcesses, type ProcessEntry } from "./contracts.shared";
-import { formatBytes } from "./format.shared";
-import { explainProcess, type Explanation } from "./explain.shared";
-import { contextMenuTriggers, useContextMenu, type ContextMenuItem } from "./menu.client";
-import { Card, useChromeStyles, type Chrome } from "./ui.client";
-import { severityOf, STATUS, type VizPalette } from "./viz.shared";
+import { killProcess, listProcesses, type ProcessEntry } from "../shared/contracts";
+import { formatBytes } from "../shared/format";
+import { explainProcess, type Explanation } from "../shared/explain";
+import { contextMenuTriggers, useContextMenu, type ContextMenuItem } from "./menu";
+import { Card, useChromeStyles, type Chrome } from "./ui";
+import { severityOf, STATUS, type VizPalette } from "../shared/viz";
 
 
 /**

@@ -1,4 +1,4 @@
-import { defineRpc } from "@getpaseo/plugin/server";
+import { defineRpc } from "@getpaseo/plugin";
 import { z } from "zod";
 
 export const PortSchema = z.object({
@@ -49,4 +49,4 @@ export const readServices = defineRpc({
 export type PortRow = z.output<typeof PortSchema>;
 export type ServiceRow = z.output<typeof ServiceSchema>;
 
-export * from "./services.classify";
+export * from "./services-classify";

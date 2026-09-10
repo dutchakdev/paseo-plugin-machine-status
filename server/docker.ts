@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import { describeError, run, runStreams, tryRun } from "./exec.server";
+import { describeError, run, runStreams, tryRun } from "./exec";
 import type {
   controlContainer,
   controlEngine,
@@ -11,7 +11,7 @@ import type {
   DockerEngine,
   DockerImage,
   DockerUsageRow,
-} from "./docker.shared";
+} from "../shared/docker";
 
 type ReadOutput = z.output<typeof readDocker.output>;
 type ControlInput = z.output<typeof controlContainer.input>;

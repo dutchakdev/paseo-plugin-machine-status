@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { classify, describeKnown, type ProcessEvidence } from "../explain.rules";
+import { classify, describeKnown, type ProcessEvidence } from "../server/explain-rules";
 
 const GB = 1024 ** 3;
 
