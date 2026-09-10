@@ -102,7 +102,11 @@ cannot be read shows as `—` rather than as zero.
 One poll every ten seconds feeds every open agent's pill at once. Paseo draws
 the label, so the numbers reach each pill through its `update`; the icon is the
 plugin's own and takes the warning colour when either reading turns serious.
-Pressing the pill opens the Machine tab.
+Pressing the pill opens a compact card instead of leaving the chat: both
+readings with their recent trend and their severity in words, the three
+processes using the most CPU right now, and any development ports held by an
+agent or by a process an agent started. **Open Machine** at the bottom leads to
+the full tab. On a phone the card is a bottom sheet.
 
 ## Reading the dashboard
 

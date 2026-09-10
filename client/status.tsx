@@ -18,6 +18,7 @@ import {
   spanLabel,
   STATUS,
 } from "../shared/viz";
+import { cpuSeverity as cpuSeverityOf, memorySeverity as memorySeverityOf } from "../shared/pill";
 
 type Expanded = "cpu" | "memory" | "swap" | "disk" | null;
 
@@ -74,8 +75,9 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
     [history, data?.memory.totalBytes],
   );
 
-  const cpuSeverity = severityOf(data?.cpu.loadPercent ?? null);
-  const memorySeverity = severityOf(data?.memory.pressurePercent ?? null);
+  // The pill and its card colour by the same thresholds; so does this tab.
+  const cpuSeverity = cpuSeverityOf(data?.cpu.loadPercent ?? null);
+  const memorySeverity = memorySeverityOf(data?.memory.pressurePercent ?? null);
   const diskSeverity = severityOf(data?.disk.usedPercent ?? null, 85, 95);
   const swapPercent =
     data && data.swap.totalBytes > 0 ? (data.swap.usedBytes / data.swap.totalBytes) * 100 : 0;

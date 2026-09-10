@@ -1,3 +1,4 @@
+import type { PortRow } from "./services";
 import { severityOf, type Severity } from "./viz";
 
 export interface PillReading {
@@ -24,11 +25,39 @@ const show = (value: number | null): string =>
  * which one.
  */
 export function pillReading(cpuLoadPercent: number, pressurePercent: number | null): PillReading {
-  const cpu = severityOf(cpuLoadPercent);
-  const memory = severityOf(pressurePercent, 80, 92);
+  const cpu = cpuSeverity(cpuLoadPercent);
+  const memory = memorySeverity(pressurePercent);
   return {
     text: `${show(cpuLoadPercent)} · ${show(pressurePercent)}`,
     severity: RANK[cpu] >= RANK[memory] ? cpu : memory,
     label: `Machine load: CPU ${show(cpuLoadPercent)}, memory ${show(pressurePercent)}`,
   };
+}
+
+/**
+ * The thresholds the pill colours by, shared with its card so the two never
+ * disagree about the same number. CPU load reads as utilisation; memory pressure
+ * keeps the higher thresholds the pill has always used.
+ */
+export function cpuSeverity(loadPercent: number | null): Severity {
+  return severityOf(loadPercent);
+}
+
+export function memorySeverity(pressurePercent: number | null): Severity {
+  return severityOf(pressurePercent, 80, 92);
+}
+
+/**
+ * Development ports held by an agent or by a process an agent started, once per
+ * port number: the side effects of agent work that outlive the turn that made
+ * them. IPv4 and IPv6 listeners on the same port collapse into one row.
+ */
+export function agentPorts(ports: readonly PortRow[], limit = 3): PortRow[] {
+  const byPort = new Map<number, PortRow>();
+  for (const port of ports) {
+    const kind = port.attribution?.kind;
+    if (port.relevance !== "dev" || (kind !== "agent" && kind !== "agent-child")) continue;
+    if (!byPort.has(port.port)) byPort.set(port.port, port);
+  }
+  return [...byPort.values()].sort((a, b) => a.port - b.port).slice(0, limit);
 }

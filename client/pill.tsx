@@ -7,6 +7,7 @@ import type {
 import { Icon } from "@getpaseo/plugin/client/react-native";
 import React, { useSyncExternalStore } from "react";
 import { readMetrics } from "../shared/contracts";
+import { createMachineCard } from "./pill-card";
 import { pillReading, type PillReading } from "../shared/pill";
 import { STATUS } from "../shared/viz";
 
@@ -71,6 +72,7 @@ interface TrackedAgent {
 export function contributePills(client: PluginClientContext) {
   const store = createReadingStore();
   const icon = createIcon(store);
+  const card = createMachineCard(() => client.openSurface("main"));
   const pills = new Map<string, { workspaceId: string; registration: PluginButtonRegistration }>();
   let disposed = false;
   let inFlight = false;
@@ -81,12 +83,9 @@ export function contributePills(client: PluginClientContext) {
       title: current?.label ?? "Machine load",
       icon,
       label: current?.text ?? "Machine",
-      behavior: {
-        kind: "action",
-        onPress() {
-          client.openSurface("main");
-        },
-      },
+      // A compact card rather than a jump to the tab: the question beside the
+      // composer is "is it the machine", and the answer should not cost the chat.
+      behavior: { kind: "popover", Content: card },
     };
   }
 
