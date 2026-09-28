@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Paseo-0.8.x%20%7C%200.9.x-3987e5" alt="Supports Paseo 0.8.x and 0.9.x, including betas">
+  <img src="https://img.shields.io/badge/Paseo-0.8.x%20%7C%200.9.x%20%7C%200.10.x-3987e5" alt="Supports Paseo 0.8.x, 0.9.x and 0.10.x, including betas">
   <img src="https://img.shields.io/badge/macOS-only-9aa1a6" alt="macOS only">
   <img src="https://img.shields.io/badge/tests-237-199e70" alt="237 tests">
   <img src="https://img.shields.io/badge/dependencies-none-c98500" alt="No runtime dependencies">
@@ -34,11 +34,11 @@ paseo plugin ls          # expect: running
 ```
 
 `plugin add` tracks the default branch, so `paseo plugin update machine-status`
-pulls later fixes. The plugin supports **Paseo 0.8.x and 0.9.x, including betas**,
+pulls later fixes. The plugin supports **Paseo 0.8.x, 0.9.x and 0.10.x, including betas**,
 on both the daemon, which runs its collectors, and the app, which runs its screens.
 
-The manifest remains `>=0.8.0`, which already admits 0.9.x. Paseo also checks a
-prerelease's stable version core, so `0.9.0-beta.2` satisfies this range; see
+The manifest remains `>=0.8.0`, which already admits 0.9.x and 0.10.x. Paseo also checks a
+prerelease's stable version core, so `0.10.0-beta.1` satisfies this range; see
 [version requirements](https://paseo.sh/docs/plugins/reference#requirements).
 
 To work on it locally instead:
@@ -344,7 +344,7 @@ mutate anything: cleanup is only planned, and the kill tests assert refusals,
 including a refusal to terminate the test runner itself.
 
 The SDK remains pinned to 0.8.0 as the development baseline for typechecking and
-tests. Paseo supplies the runtime instances on both supported release lines, so
+tests. Paseo supplies the runtime instances on every supported release line, so
 none of it ships with the plugin.
 
 ## Troubleshooting
