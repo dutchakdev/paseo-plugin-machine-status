@@ -7,6 +7,7 @@ import type {
 import { Icon } from "@getpaseo/plugin/client/react-native";
 import React, { useSyncExternalStore } from "react";
 import { readMetrics } from "../shared/contracts";
+import { openMachineScreen } from "./compat";
 import { createMachineCard } from "./pill-card";
 import { pillReading, type PillReading } from "../shared/pill";
 import { STATUS } from "../shared/viz";
@@ -72,7 +73,7 @@ interface TrackedAgent {
 export function contributePills(client: PluginClientContext) {
   const store = createReadingStore();
   const icon = createIcon(store);
-  const card = createMachineCard(() => client.openSurface("main"));
+  const card = createMachineCard(() => openMachineScreen(client));
   const pills = new Map<string, { workspaceId: string; registration: PluginButtonRegistration }>();
   let disposed = false;
   let inFlight = false;
