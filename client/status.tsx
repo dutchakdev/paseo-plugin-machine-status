@@ -1,11 +1,12 @@
 import { useRpc, type PluginSurfaceProps } from "@getpaseo/plugin/client";
 import { useQuery } from "@tanstack/react-query";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { ColumnChart, Legend, Meter, Sparkbars, StackedColumnChart, StatTile } from "./charts";
 import { ServicesTab } from "./services";
 import { CleanupSection } from "./cleanup";
 import { DockerTab } from "./docker";
+import type { MachineScreenProps } from "./compat";
 import { ContextMenuProvider } from "./menu";
 import { readMetrics, type Metrics } from "../shared/contracts";
 import { formatBytes, formatDuration, formatMinutes, formatPercent } from "../shared/format";
@@ -444,7 +445,7 @@ function DetailCard({
 }
 
 
-type TabId = "overview" | "services" | "docker";
+export type TabId = "overview" | "services" | "docker";
 
 const TABS: readonly { id: TabId; title: string }[] = [
   { id: "overview", title: "Overview" },
@@ -452,15 +453,23 @@ const TABS: readonly { id: TabId; title: string }[] = [
   { id: "docker", title: "Docker" },
 ];
 
+/** `?tab=` from a 0.11 screen link; anything unknown, or no params at all, is the overview. */
+function tabFromParams(params: MachineScreenProps["params"]): TabId {
+  return TABS.find((entry) => entry.id === params?.tab)?.id ?? "overview";
+}
+
 /**
  * Only the selected tab is mounted. The services tab shells out to netstat, lsof
  * and docker on a timer, and mounting it in the background would keep that
  * running for a panel nobody is looking at.
  */
-export function MachineStatusSurface(props: PluginSurfaceProps) {
+export function MachineStatusSurface(props: MachineScreenProps) {
   const chrome: Chrome = { theme: props.theme, compact: props.layout.compact };
   const styles = useChromeStyles(chrome);
-  const [tab, setTab] = useState<TabId>("overview");
+  const linkedTab = tabFromParams(props.params);
+  const [tab, setTab] = useState<TabId>(linkedTab);
+  // Opening the already-open screen with another `tab` swaps params without a remount.
+  useEffect(() => setTab(linkedTab), [linkedTab]);
 
   return (
     <ContextMenuProvider chrome={chrome}>

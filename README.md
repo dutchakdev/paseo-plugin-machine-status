@@ -56,7 +56,10 @@ paseo plugin ls          # expect: running
 Plugins must be enabled daemon-wide first, under **Settings → Plugins → Enable
 plugins** (the root `pluginsEnabled` field in `~/.paseo/config.json`).
 
-Open it from the **Machine** sidebar item, or ⌘K → "Machine status".
+Open it from the **Machine** sidebar item, or ⌘K → "Machine status". On Paseo 0.11
+and newer, ⌘K also offers "Machine: ports & services" and "Machine: Docker", which
+open straight on that tab, and the tab travels in the screen's link (`?tab=services`,
+`?tab=docker`), so reload and back keep it.
 
 ## The screen
 
@@ -328,8 +331,7 @@ confirmed step.
 ## Development
 
 ```bash
-npm run typecheck
-npm test                              # 237 tests
+npm run check                         # typecheck, then the tests
 paseo plugin reload machine-status    # source edits need an explicit reload
 paseo plugin logs machine-status
 npm run preview                       # regenerates docs/preview.svg from the real palette
@@ -344,15 +346,35 @@ would otherwise surface as an RPC rejection at runtime. The live tests never
 mutate anything: cleanup is only planned, and the kill tests assert refusals,
 including a refusal to terminate the test runner itself.
 
-The SDK remains pinned to 0.8.0 as the development baseline for typechecking and
-tests. Paseo supplies the runtime instances on every supported release line, so
-none of it ships with the plugin.
+### Paseo versions
+
+The SDK stays pinned to 0.8.0 for typechecking and tests, so the compiler proves
+the plugin uses only the oldest supported API. Paseo supplies the runtime instances
+on every supported release line, so none of it ships with the plugin.
+
+Paseo 0.11 replaced surfaces with screens and kept the old calls as deprecated
+aliases. The manifest still admits 0.8, and each connected app evaluates the client
+entry against its own version, so `client/compat.tsx` describes the 0.11 additions
+locally and calls them only after checking that the app has them:
+
+| App version | Screen | Sidebar | Opens with | Tab shortcuts in ⌘K |
+| ----------- | ------ | ------- | ---------- | ------------------- |
+| 0.11 and newer | `addScreen` | `addSidebarHeaderItem` + `SidebarRow` | `openScreen`, with `?tab=` | yes |
+| 0.8 to 0.10 | `addSurface` | `addSidebarItem` | `openSurface`, overview tab | not offered |
+
+Both paths register under the id `main`, so saved `/plugin/machine-status/main`
+links open the same screen after an upgrade. `tests/compat.test.ts` pins both
+paths, including a half-present API, which falls back rather than mixing the two.
+The daemon half uses only `server.handle`, which has not changed since 0.8.
+
+Releases are cut from tags by GitHub Actions; see [CONTRIBUTING.md](CONTRIBUTING.md)
+for the flow and [CHANGELOG.md](CHANGELOG.md) for what changed.
 
 ## Troubleshooting
 
 | Symptom | Check |
 | ------- | ----- |
-| Sidebar item missing | `paseo plugin ls` reports `running`, and the client is on this host |
+| Sidebar item missing | `paseo plugin ls` reports `running`, the client is on this host, and on 0.11+ the item is not hidden in **Settings → Sidebar** |
 | "Metrics unavailable" | The daemon is not on macOS, or a `/usr/bin` tool is missing |
 | Charts look empty | History starts empty; it fills as the tab stays open |
 | A port shows "another user" | It belongs to root or another account; `lsof` cannot inspect it unprivileged |
