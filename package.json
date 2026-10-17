@@ -1,6 +1,6 @@
 {
   "name": "paseo-plugin-machine-status",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Machine dashboard, open ports and Docker control inside Paseo",
   "license": "MIT",
   "author": "dutchakdev",
