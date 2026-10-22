@@ -30,7 +30,7 @@ const INK = {
 };
 
 const machine = {
-  hostname: "macbook-m1.local",
+  hostname: "mac.local",
   platform: "Darwin 27.0.0 (arm64) · up 5d 11h",
   cpu: { cores: 8, loadAvg1: 2.31, loadAvg5: 1.98, loadAvg15: 1.75, loadPercent: 28.9 },
   memory: { totalBytes: 16 * GB, usedBytes: 11.0 * GB, appBytes: 5.6 * GB, wiredBytes: 2.1 * GB, compressedBytes: 3.3 * GB, pressurePercent: 37 },

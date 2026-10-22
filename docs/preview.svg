@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="980" height="436" viewBox="0 0 980 436">
 <rect x="0" y="0" width="980" height="436" rx="14" fill="#131516"/>
-<text x="22" y="30" fill="#e8eaec" font-size="21" font-weight="700" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >macbook-m1.local</text>
+<text x="22" y="30" fill="#e8eaec" font-size="21" font-weight="700" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >mac.local</text>
 <text x="22" y="50" fill="#9aa1a6" font-size="11" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="start" >Darwin 27.0.0 (arm64) · up 5d 11h</text>
 <text x="958" y="28" fill="#626a70" font-size="10" font-weight="400" font-family="system-ui, -apple-system, sans-serif" text-anchor="end" >Live · every 3s · last 4 min</text>
 <rect x="22" y="74" width="223.5" height="128" rx="12" fill="#1a1d1f" stroke="rgba(255,255,255,0.10)"/>

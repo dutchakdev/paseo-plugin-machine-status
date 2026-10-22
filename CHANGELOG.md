@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Changed
+
+- The README opens with a screenshot of the Machine screen, and its install section lists
+  the plugin directory, npm and GitHub sources by Paseo version.
+
 ### Fixed
 
 - Removing a Docker image from the Docker tab failed with an RPC rejection, because the
