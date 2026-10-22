@@ -6,6 +6,13 @@ import {
   parseReclaimed,
   parseSystemDf,
 } from "../server/docker";
+import { DockerIdSchema, controlContainer, readContainerLogs, removeImage } from "../shared/docker";
+
+/** Captured verbatim from this machine. */
+const IMAGES = `61736dcb7ce8\theylove-admin:ci\t430MB\t3 days ago
+3ca86cc6b633\theylove-api:ci\t1.15GB\t3 days ago
+aa11bb22cc33\t<none>:<none>\t112MB\t2 weeks ago
+`;
 
 /** Captured verbatim from this machine. */
 const PS = `82df267c4414\thl-search-pg\tpostgres:16\trunning\tUp 3 days\t0.0.0.0:5653->5432/tcp, [::]:5653->5432/tcp
@@ -108,12 +115,6 @@ describe("parseReclaimed", () => {
 });
 
 describe("parseImages", () => {
-  /** Captured verbatim from this machine. */
-  const IMAGES = `61736dcb7ce8\theylove-admin:ci\t430MB\t3 days ago
-3ca86cc6b633\theylove-api:ci\t1.15GB\t3 days ago
-aa11bb22cc33\t<none>:<none>\t112MB\t2 weeks ago
-`;
-
   it("reads the reference and size", () => {
     const images = parseImages(IMAGES);
     expect(images[0].reference).toBe("heylove-admin:ci");
@@ -132,5 +133,25 @@ aa11bb22cc33\t<none>:<none>\t112MB\t2 weeks ago
 
   it("ignores blank lines", () => {
     expect(parseImages("\n\n")).toEqual([]);
+  });
+});
+
+describe("Docker ids at the RPC boundary", () => {
+  it("accepts every id parsed from captured docker output", () => {
+    const ids = [...parseContainers(PS), ...parseImages(IMAGES)].map((entry) => entry.id);
+    expect(ids.length).toBeGreaterThan(3);
+    for (const id of ids) {
+      expect(removeImage.input.safeParse({ id }).success).toBe(true);
+      expect(controlContainer.input.safeParse({ id, action: "stop" }).success).toBe(true);
+      expect(readContainerLogs.input.safeParse({ id }).success).toBe(true);
+    }
+    expect(DockerIdSchema.safeParse("a".repeat(64)).success).toBe(true);
+  });
+
+  it("refuses anything the Docker CLI would read as an option or a name", () => {
+    for (const id of ["--force", "-f", "", "hl-search-pg", "postgres:16", "82df267c4414 --force", "82DF267C4414", "82df267c441"]) {
+      expect(DockerIdSchema.safeParse(id).success, id).toBe(false);
+      expect(removeImage.input.safeParse({ id }).success, id).toBe(false);
+    }
   });
 });

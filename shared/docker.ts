@@ -22,6 +22,14 @@ export const DockerUsageRowSchema = z.object({
   safeToReclaim: z.boolean(),
 });
 
+/**
+ * The ids this plugin hands the client come from `{{.ID}}` in `docker ps` and
+ * `docker images`: hex, 12 characters, or 64 untruncated. Anything else, such
+ * as `--force`, would reach the Docker CLI as an argument, so it is refused at
+ * the contract rather than trusted because the client normally sends an id.
+ */
+export const DockerIdSchema = z.string().regex(/^[0-9a-f]{12,64}$/, "Expected a Docker id");
+
 export const DockerImageSchema = z.object({
   id: z.string(),
   reference: z.string(),
@@ -62,7 +70,7 @@ export const controlEngine = defineRpc({
 export const readContainerLogs = defineRpc({
   name: "docker.logs",
   input: z.object({
-    id: z.string().min(1),
+    id: DockerIdSchema,
     lines: z.number().int().min(10).max(500).default(120),
   }),
   output: z.object({ ok: z.boolean(), text: z.string(), error: z.string().nullable() }),
@@ -70,14 +78,14 @@ export const readContainerLogs = defineRpc({
 
 export const removeImage = defineRpc({
   name: "docker.image.remove",
-  input: z.object({ id: z.string().min(1) }),
+  input: z.object({ id: DockerIdSchema }),
   output: z.object({ ok: z.boolean(), error: z.string().nullable() }),
 });
 
 export const controlContainer = defineRpc({
   name: "docker.control",
   input: z.object({
-    id: z.string().min(1),
+    id: DockerIdSchema,
     action: z.enum(["start", "stop", "restart", "remove"]),
   }),
   output: z.object({ ok: z.boolean(), error: z.string().nullable() }),

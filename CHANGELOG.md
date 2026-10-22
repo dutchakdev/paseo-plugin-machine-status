@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Removing a Docker image from the Docker tab failed with an RPC rejection, because the
+  daemon never registered its handler. A test now fails for any client action without a
+  handler, which also caught this one.
+- Docker actions take only the hex ids the plugin itself lists. An id that Docker would
+  read as an option, such as `--force`, is refused before any command runs.
+
 ## 0.2.2 - 2026-10-22
 
 ### Changed
