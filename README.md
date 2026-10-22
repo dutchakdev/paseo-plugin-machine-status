@@ -335,6 +335,7 @@ npm run check                         # typecheck, then the tests
 paseo plugin reload machine-status    # source edits need an explicit reload
 paseo plugin logs machine-status
 npm run preview                       # regenerates docs/preview.svg from the real palette
+./scripts/preview-png.sh              # renders it to docs/preview.png for the plugin directory
 ```
 
 Tests cover the command-output parsers against captured real output, the path and
