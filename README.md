@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Paseo-0.8.x%20%E2%80%93%200.12.x-3987e5" alt="Supports Paseo 0.8.x through 0.12.x, including betas">
+  <img src="https://img.shields.io/badge/Paseo-0.8.x%20%E2%80%93%200.13.x-3987e5" alt="Supports Paseo 0.8.x through 0.13.x, including betas">
   <img src="https://img.shields.io/badge/macOS-only-9aa1a6" alt="macOS only">
   <img src="https://img.shields.io/badge/tests-237-199e70" alt="237 tests">
   <img src="https://img.shields.io/badge/dependencies-none-c98500" alt="No runtime dependencies">
@@ -35,11 +35,11 @@ paseo plugin ls          # expect: running
 
 Paseo 0.8 has no npm sources, so install from Git there:
 `paseo plugin add dutchakdev/paseo-plugin-machine-status`. Either way,
-`paseo plugin update machine-status` pulls later releases. The plugin supports **Paseo 0.8.x through 0.12.x, including betas**,
+`paseo plugin update machine-status` pulls later releases. The plugin supports **Paseo 0.8.x through 0.13.x, including betas**,
 on both the daemon, which runs its collectors, and the app, which runs its screens.
 
-The manifest remains `>=0.8.0`, which already admits 0.9.x through 0.12.x. Paseo also checks a
-prerelease's stable version core, so `0.12.0-beta.1` satisfies this range; see
+The manifest remains `>=0.8.0`, which already admits 0.9.x through 0.13.x. Paseo also checks a
+prerelease's stable version core, so `0.13.0-beta.1` satisfies this range; see
 [version requirements](https://paseo.sh/docs/plugins/reference#requirements).
 
 To work on it locally instead:
