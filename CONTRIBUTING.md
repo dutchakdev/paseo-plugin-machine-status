@@ -1,6 +1,6 @@
 # Contributing
 
-Machine Status is a TypeScript plugin for Paseo 0.8.x through 0.12.x, including beta releases, with a React Native client and a Node.js daemon component that reads a macOS machine. Changes should keep its readings honest: report what cannot be measured instead of estimating it.
+Machine Status is a TypeScript plugin for Paseo 0.8.x through 0.13.x, including beta releases, with a React Native client and a Node.js daemon component that reads a macOS machine. Changes should keep its readings honest: report what cannot be measured instead of estimating it.
 
 ## Development setup
 

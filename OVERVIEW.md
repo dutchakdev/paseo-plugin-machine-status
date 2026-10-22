@@ -14,7 +14,7 @@ Machine Status shows what the daemon's Mac is doing while your agents work: CPU 
 
 ## Setup
 
-- A macOS daemon on Paseo 0.8 to 0.12. On other platforms the screen says it cannot collect metrics.
+- A macOS daemon on Paseo 0.8 to 0.13. On other platforms the screen says it cannot collect metrics.
 - Docker Desktop, OrbStack or Rancher Desktop for the Docker tab. Without one, the tab says which is missing.
 
 ## What it can change
