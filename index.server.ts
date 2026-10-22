@@ -6,13 +6,14 @@ import {
   pruneDockerHandler,
   readContainerLogsHandler,
   readDockerHandler,
+  removeImageHandler,
 } from "./server/docker";
 import { explainProcessHandler } from "./server/explain";
 import { readMetricsHandler } from "./server/metrics";
 import { killProcessHandler, listProcessesHandler } from "./server/processes";
 import { readServicesHandler } from "./server/services";
 import { applyCleanup, killProcess, listProcesses, planCleanup, readMetrics } from "./shared/contracts";
-import { controlContainer, controlEngine, pruneDocker, readContainerLogs, readDocker } from "./shared/docker";
+import { controlContainer, controlEngine, pruneDocker, readContainerLogs, readDocker, removeImage } from "./shared/docker";
 import { explainProcess } from "./shared/explain";
 import { readServices } from "./shared/services";
 
@@ -34,6 +35,7 @@ export default function contribute(server: PluginServerContext) {
   server.handle(controlEngine, controlEngineHandler);
   server.handle(readContainerLogs, readContainerLogsHandler);
   server.handle(pruneDocker, pruneDockerHandler);
+  server.handle(removeImage, removeImageHandler);
 
   // No timers, watchers or sockets are created at registration time, so there is
   // nothing to release. Paseo removes the handlers and stops the subprocess.
