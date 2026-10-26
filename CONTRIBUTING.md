@@ -13,7 +13,7 @@ npm run check        # typecheck, then the full test suite
 
 Parser tests run against captured real output of `vm_stat`, `df`, `ps`, `lsof`, `netstat` and `docker`. Add a capture, not a made-up string, when a parser changes. The live tests run only on macOS and never change anything: cleanup is only planned, and kill tests assert refusals.
 
-SDK development dependencies stay pinned to 0.8.0, so typechecking proves the plugin uses only the oldest supported API. Newer APIs go through `client/compat.tsx`, which describes them locally and calls them only after checking that the connected app has them.
+SDK development dependencies stay pinned to 0.8.0, so typechecking proves the plugin uses only the 0.8 API, which every supported release still provides. Newer APIs go through `client/compat.tsx`, which describes them locally and calls them only after checking that the connected app has them.
 
 Server and client code must not import `@getpaseo/client` or `@getpaseo/protocol` directly, even for types: they are development dependencies and are absent from an npm installation.
 
