@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#26272D"/>
+      <stop offset="1" stop-color="#141417"/>
+    </linearGradient>
+    <linearGradient id="value" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#D9714D"/>
+      <stop offset="1" stop-color="#F4A27E"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <!-- Gauge on one circle (center 256,290; r=160): 250-degree track, value up to 70 degrees -->
+  <path d="M124.9,381.8 A160 160 0 1 1 387.1,381.8" fill="none" stroke="#737683" stroke-width="30" stroke-linecap="round"/>
+  <path d="M124.9,381.8 A160 160 0 0 1 310.7,139.6" fill="none" stroke="url(#value)" stroke-width="30" stroke-linecap="round"/>
+  <!-- Needle and hub, outlined in the background color so they read apart from the track -->
+  <g fill="#F5F5F7" stroke="#1C1D21" stroke-width="12" paint-order="stroke" stroke-linejoin="round">
+    <path d="M276.7,297.5 L300.5,167.8 L235.3,282.5Z"/>
+    <circle cx="256" cy="290" r="30"/>
+  </g>
+</svg>
