@@ -11,7 +11,7 @@
 <p align="center">
   <a href="https://github.com/dutchakdev/paseo-plugin-machine-status/actions/workflows/ci.yml"><img src="https://github.com/dutchakdev/paseo-plugin-machine-status/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
   <a href="https://www.npmjs.com/package/paseo-plugin-machine-status"><img src="https://img.shields.io/npm/v/paseo-plugin-machine-status" alt="npm"></a>
-  <img src="https://img.shields.io/badge/Paseo-0.11.x%20%E2%80%93%200.13.x-3987e5" alt="Supports Paseo 0.11.x through 0.13.x, including betas">
+  <img src="https://img.shields.io/badge/Paseo-0.11.x%20%E2%80%93%200.14.x-3987e5" alt="Supports Paseo 0.11.x through 0.14.x, including betas">
   <img src="https://img.shields.io/badge/macOS-only-9aa1a6" alt="macOS only">
   <img src="https://img.shields.io/badge/dependencies-none-c98500" alt="No runtime dependencies">
   <img src="https://img.shields.io/badge/license-MIT-9aa1a6" alt="MIT licensed">
@@ -44,12 +44,12 @@ source that matches your Paseo:
 Paseo 0.11 a bare `owner/name` names a directory entry, so a GitHub source there needs
 the `git:` prefix: `git:dutchakdev/paseo-plugin-machine-status`.
 
-The plugin supports **Paseo 0.11.x through 0.13.x, including betas**, on both the
+The plugin supports **Paseo 0.11.x through 0.14.x, including betas**, on both the
 daemon, which runs its collectors, and the app, which runs its screens.
 
 The manifest asks for `>=0.11.0` because it declares the icon shown in the plugin
 directory, and Paseo 0.8 to 0.10 refuse a manifest with a field they do not know.
-Paseo also checks a prerelease's stable version core, so `0.13.0-beta.1` satisfies
+Paseo also checks a prerelease's stable version core, so `0.14.0-beta.1` satisfies
 this range. The 0.11.0 betas pass that check but predate the `icon` field, so they
 refuse the manifest as well and need the release named in the install table; see
 [version requirements](https://paseo.sh/docs/plugins/reference#requirements).
