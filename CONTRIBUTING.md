@@ -15,6 +15,8 @@ Parser tests run against captured real output of `vm_stat`, `df`, `ps`, `lsof`, 
 
 SDK development dependencies stay pinned to 0.8.0, so typechecking proves the plugin uses only the 0.8 API, which every supported release still provides. Newer APIs go through `client/compat.tsx`, which describes them locally and calls them only after checking that the connected app has them.
 
+Typechecking runs TypeScript 7, the native compiler. Its npm package ships no `tsserver` and no `lib` files, so an editor set to use the workspace's TypeScript shows no types; let the editor use its bundled TypeScript. `@types/node` stays at the major of the oldest Node.js in the CI matrix, 22, so typechecking catches an API that Node lacks, and Dependabot leaves its majors alone. `vite` is a direct development dependency because Vitest 5 requires it as a peer, and the `--legacy-peer-deps` install in CI skips peers under npm 11 (Node 24).
+
 Server and client code must not import `@getpaseo/client` or `@getpaseo/protocol` directly, even for types: they are development dependencies and are absent from an npm installation.
 
 ## Changelog and releases
