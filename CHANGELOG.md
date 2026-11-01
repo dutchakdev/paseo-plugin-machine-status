@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- The load pill follows agents across a dropped connection. Paseo 0.15 no longer sets a plugin up again when it reconnects, so an agent created while the app was away got no pill until it next changed, and one removed meanwhile kept its pill. The pill also reads agents beyond the first 200, and asks for a new observation when Paseo drops one.
+
 ## 0.3.1 - 2026-10-27
 
 ### Changed

@@ -7,6 +7,7 @@ import type {
 import { Icon } from "@getpaseo/plugin/client/react-native";
 import React, { useSyncExternalStore } from "react";
 import { readMetrics } from "../shared/contracts";
+import { followAgents, type DirectoryAgent } from "./agent-directory";
 import { openMachineScreen } from "./compat";
 import { createMachineCard } from "./pill-card";
 import { pillReading, type PillReading } from "../shared/pill";
@@ -56,19 +57,12 @@ function createIcon(store: ReadingStore) {
   };
 }
 
-interface TrackedAgent {
-  id: string;
-  workspaceId?: string | null;
-  archivedAt?: string | null;
-}
-
 /**
  * CPU load and memory pressure beside every agent's composer, fed by one poll.
  *
  * Paseo scopes a pill to a single agent, so this follows the agent directory: a
  * pill appears for each agent that has a workspace and goes when the agent is
- * archived or removed. The directory is seeded from `list`, because a
- * subscription reports changes rather than the agents that already exist.
+ * archived or removed.
  */
 export function contributePills(client: PluginClientContext) {
   const store = createReadingStore();
@@ -124,32 +118,19 @@ export function contributePills(client: PluginClientContext) {
     pills.delete(agentId);
   }
 
-  function track(agent: TrackedAgent) {
+  function track(agent: DirectoryAgent) {
     if (agent.workspaceId && !agent.archivedAt) show(agent.id, agent.workspaceId);
     else hide(agent.id);
   }
 
-  const unsubscribe = client.paseo.agents.subscribe((update) => {
-    if (disposed) return;
-    if (update.kind === "upsert") track(update.agent);
-    else hide(update.agentId);
-  });
-
-  client.paseo.agents
-    .list()
-    .then(({ entries }) => {
-      if (!disposed) for (const entry of entries) track(entry.agent);
-    })
-    .catch(() => {
-      // Without the seed, pills appear as each agent next reports a change.
-    });
+  const stopFollowing = followAgents(client.paseo, { track, hide, known: () => pills.keys() });
 
   const timer = setInterval(() => void refresh(), REFRESH_MS);
 
   return () => {
     disposed = true;
     clearInterval(timer);
-    unsubscribe();
+    stopFollowing();
     for (const { registration } of pills.values()) registration.remove();
     pills.clear();
   };
