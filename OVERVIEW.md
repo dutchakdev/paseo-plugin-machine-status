@@ -24,3 +24,9 @@ Machine Status shows what the daemon's Mac is doing while your agents work: CPU 
 - **Docker**: start, stop, restart and remove containers, quit or start the engine, and prune stopped containers and dangling images. Volumes are never pruned.
 
 Everything runs on the daemon through local commands such as `vm_stat`, `ps`, `lsof`, `netstat` and `docker`. Nothing is sent off the machine.
+
+## Other plugins by dutchakdev
+
+- [Account Switcher](https://paseo.sh/plugins/dutchakdev/account-switcher): several Claude and ChatGPT/Codex subscription accounts in Paseo, with an account per agent, switching of an existing chat, and every account's limits.
+- [Mermaid](https://paseo.sh/plugins/dutchakdev/mermaid): draws Mermaid flowcharts and sequence diagrams from chat messages and `.mmd` files, on desktop and mobile.
+- [secure-input](https://paseo.sh/plugins/dutchakdev/secure-input): agents ask you for secrets through a form, and each value lands in a short-lived file the agent moves without reading it.

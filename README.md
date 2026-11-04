@@ -403,6 +403,12 @@ for the flow and [CHANGELOG.md](CHANGELOG.md) for what changed.
 | A cache shows "not present" | The tool is not installed, or it moved its cache |
 | Edits do not appear | `npm run typecheck`, then `paseo plugin reload machine-status` |
 
+## Other plugins by dutchakdev
+
+- [Account Switcher](https://paseo.sh/plugins/dutchakdev/account-switcher) ([source](https://github.com/dutchakdev/paseo-plugin-account-switcher)): several Claude and ChatGPT/Codex subscription accounts in Paseo, with an account per agent, switching of an existing chat, and every account's limits.
+- [Mermaid](https://paseo.sh/plugins/dutchakdev/mermaid) ([source](https://github.com/dutchakdev/paseo-plugin-mermaid)): draws Mermaid flowcharts and sequence diagrams from chat messages and `.mmd` files, on desktop and mobile.
+- [secure-input](https://paseo.sh/plugins/dutchakdev/secure-input) ([source](https://github.com/dutchakdev/paseo-plugin-secure-input)): agents ask you for secrets through a form, and each value lands in a short-lived file the agent moves without reading it.
+
 ## License
 
 MIT
