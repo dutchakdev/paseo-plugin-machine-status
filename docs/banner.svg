@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="447" viewBox="0 0 980 447">
+  <defs>
+    <radialGradient id="glow" cx="0.78" cy="0.42" r="0.62">
+      <stop offset="0" stop-color="#6c55f0" stop-opacity="0.30"/>
+      <stop offset="0.55" stop-color="#3a2d86" stop-opacity="0.10"/>
+      <stop offset="1" stop-color="#131516" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1f2126"/>
+      <stop offset="1" stop-color="#191a1f"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a08cff"/>
+      <stop offset="1" stop-color="#7a62f2"/>
+    </linearGradient>
+    <pattern id="dots" width="18" height="18" patternUnits="userSpaceOnUse">
+      <circle cx="1.5" cy="1.5" r="1" fill="#ffffff" opacity="0.045"/>
+    </pattern>
+  </defs>
+
+  <rect x="0" y="0" width="980" height="447" rx="14" fill="#131516"/>
+  <rect x="0" y="0" width="980" height="447" rx="14" fill="url(#dots)"/>
+  <rect x="0" y="0" width="980" height="447" rx="14" fill="url(#glow)"/>
+
+  <text x="48" y="64" fill="#626a70" font-size="11" font-weight="600" font-family="system-ui, -apple-system, sans-serif" letter-spacing="1.6">MACHINE STATUS · PASEO PLUGIN</text>
+  <text x="46" y="128" fill="#f2f3f5" font-size="38" font-weight="700" font-family="system-ui, -apple-system, sans-serif" letter-spacing="-0.6">Every core counted,</text>
+  <text x="46" y="174" fill="#f2f3f5" font-size="38" font-weight="700" font-family="system-ui, -apple-system, sans-serif" letter-spacing="-0.6">every <tspan fill="url(#accent)">agent</tspan> named.</text>
+  <text x="48" y="218" fill="#8e939a" font-size="15" font-family="system-ui, -apple-system, sans-serif">CPU in use and memory pressure beside every chat. Open the</text>
+  <text x="48" y="240" fill="#8e939a" font-size="15" font-family="system-ui, -apple-system, sans-serif">pill to see which agent the busy cores belong to.</text>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, monospace"><rect x="48" y="282" width="96" height="30" rx="8" fill="#1d1f24" stroke="#2c2f37"/><text x="96" y="301" fill="#c9ccd3" font-size="11.5" text-anchor="middle">99% · 66%</text><path d="M150 297 h22" stroke="#4b4f58" stroke-width="1.5"/><path d="M172 297 l-5 -4 v8z" fill="#4b4f58"/><rect x="178" y="282" width="178" height="30" rx="8" fill="#211d33" stroke="#3b3266"/><text x="267" y="301" fill="#b9a6ff" font-size="11.5" text-anchor="middle">who is using the CPU</text><path d="M362 297 h22" stroke="#4b4f58" stroke-width="1.5"/><path d="M384 297 l-5 -4 v8z" fill="#4b4f58"/><rect x="390" y="282" width="126" height="30" rx="8" fill="#1d1f24" stroke="#2c2f37"/><text x="453" y="301" fill="#c9ccd3" font-size="11.5" text-anchor="middle">machine_status</text><text x="48" y="336" fill="#5d6268" font-size="11.5" >agents ask too: their share, who else, whether to wait</text></g>
+  <g font-family="system-ui, -apple-system, sans-serif">
+    <rect x="48" y="377" width="122" height="28" rx="14" fill="none" stroke="#3b3266"/>
+    <circle cx="66" cy="391" r="4" fill="#8b74ff"/>
+    <text x="78" y="395.5" fill="#b9a6ff" font-size="12.5" font-weight="600">Paseo 0.11+</text>
+    <text x="184" y="395.5" fill="#5d6268" font-size="12.5" >macOS · tick counters · process tree · agent ids</text>
+  </g>
+
+  <g transform="translate(584, 40)">
+    <rect x="0" y="0" width="350" height="322" rx="16" fill="url(#card)" stroke="#2e3139"/>
+    <!-- the pill this card opens from -->
+    <rect x="18" y="18" width="150" height="34" rx="17" fill="#17181c" stroke="#2c6b43" stroke-width="1.6"/>
+    <path d="M34 35 h4 l3 -7 l5 14 l3 -7 h4" fill="none" stroke="#d03b3b" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="62" y="40" fill="#a9adb5" font-size="14" font-family="system-ui, -apple-system, sans-serif">99% · 66%</text>
+    <text x="332" y="40" fill="#5d6268" font-size="11" text-anchor="end" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">load 659 · 8 cores</text>
+    <text x="18" y="88" fill="#3987e5" font-size="10.5" font-weight="700" letter-spacing="1.2" font-family="system-ui, -apple-system, sans-serif">CPU</text><text x="170" y="88" fill="#5d6268" font-size="10.5" text-anchor="end" font-family="system-ui, -apple-system, sans-serif"></text><text x="18" y="119" fill="#d03b3b" font-size="26" font-weight="700" font-family="system-ui, -apple-system, sans-serif" letter-spacing="-0.4">99%</text><text x="84" y="119" fill="#d03b3b" font-size="11" font-family="system-ui, -apple-system, sans-serif">Critical</text><rect x="18.0" y="151.2" width="5.7" height="8.8" rx="1" fill="#3987e5"/><rect x="25.7" y="150.1" width="5.7" height="9.9" rx="1" fill="#3987e5"/><rect x="33.4" y="149.3" width="5.7" height="10.7" rx="1" fill="#3987e5"/><rect x="41.1" y="147.8" width="5.7" height="12.2" rx="1" fill="#3987e5"/><rect x="48.8" y="146.5" width="5.7" height="13.5" rx="1" fill="#3987e5"/><rect x="56.5" y="144.9" width="5.7" height="15.1" rx="1" fill="#3987e5"/><rect x="64.2" y="143.6" width="5.7" height="16.4" rx="1" fill="#3987e5"/><rect x="71.9" y="141.5" width="5.7" height="18.5" rx="1" fill="#3987e5"/><rect x="79.6" y="139.7" width="5.7" height="20.3" rx="1" fill="#3987e5"/><rect x="87.3" y="138.2" width="5.7" height="21.8" rx="1" fill="#3987e5"/><rect x="95.0" y="136.6" width="5.7" height="23.4" rx="1" fill="#3987e5"/><rect x="102.7" y="135.3" width="5.7" height="24.7" rx="1" fill="#3987e5"/><rect x="110.4" y="134.8" width="5.7" height="25.2" rx="1" fill="#3987e5"/><rect x="118.1" y="134.3" width="5.7" height="25.7" rx="1" fill="#3987e5"/><rect x="125.8" y="134.5" width="5.7" height="25.5" rx="1" fill="#3987e5"/><rect x="133.5" y="134.3" width="5.7" height="25.7" rx="1" fill="#3987e5"/><rect x="141.2" y="134.0" width="5.7" height="26.0" rx="1" fill="#3987e5"/><rect x="148.9" y="134.3" width="5.7" height="25.7" rx="1" fill="#3987e5"/><rect x="156.6" y="134.5" width="5.7" height="25.5" rx="1" fill="#3987e5"/><rect x="164.3" y="134.3" width="5.7" height="25.7" rx="1" fill="#3987e5"/>
+    <text x="180" y="88" fill="#d95926" font-size="10.5" font-weight="700" letter-spacing="1.2" font-family="system-ui, -apple-system, sans-serif">MEMORY</text><text x="332" y="88" fill="#5d6268" font-size="10.5" text-anchor="end" font-family="system-ui, -apple-system, sans-serif">swap 1.2 GB</text><text x="180" y="119" fill="#f2f3f5" font-size="26" font-weight="700" font-family="system-ui, -apple-system, sans-serif" letter-spacing="-0.4">66%</text><text x="246" y="119" fill="#5d6268" font-size="11" font-family="system-ui, -apple-system, sans-serif">OK</text><rect x="180.0" y="146.5" width="5.7" height="13.5" rx="1" fill="#d95926"/><rect x="187.7" y="146.2" width="5.7" height="13.8" rx="1" fill="#d95926"/><rect x="195.4" y="145.7" width="5.7" height="14.3" rx="1" fill="#d95926"/><rect x="203.1" y="145.4" width="5.7" height="14.6" rx="1" fill="#d95926"/><rect x="210.8" y="144.9" width="5.7" height="15.1" rx="1" fill="#d95926"/><rect x="218.5" y="144.7" width="5.7" height="15.3" rx="1" fill="#d95926"/><rect x="226.2" y="144.1" width="5.7" height="15.9" rx="1" fill="#d95926"/><rect x="233.9" y="143.9" width="5.7" height="16.1" rx="1" fill="#d95926"/><rect x="241.6" y="143.6" width="5.7" height="16.4" rx="1" fill="#d95926"/><rect x="249.3" y="143.6" width="5.7" height="16.4" rx="1" fill="#d95926"/><rect x="257.0" y="143.4" width="5.7" height="16.6" rx="1" fill="#d95926"/><rect x="264.7" y="143.1" width="5.7" height="16.9" rx="1" fill="#d95926"/><rect x="272.4" y="143.1" width="5.7" height="16.9" rx="1" fill="#d95926"/><rect x="280.1" y="142.8" width="5.7" height="17.2" rx="1" fill="#d95926"/><rect x="287.8" y="142.8" width="5.7" height="17.2" rx="1" fill="#d95926"/><rect x="295.5" y="142.8" width="5.7" height="17.2" rx="1" fill="#d95926"/><rect x="303.2" y="143.1" width="5.7" height="16.9" rx="1" fill="#d95926"/><rect x="310.9" y="142.8" width="5.7" height="17.2" rx="1" fill="#d95926"/><rect x="318.6" y="142.8" width="5.7" height="17.2" rx="1" fill="#d95926"/><rect x="326.3" y="142.8" width="5.7" height="17.2" rx="1" fill="#d95926"/>
+    <rect x="18" y="176" width="314" height="1" fill="rgba(255,255,255,0.08)"/>
+    <text x="18" y="198" fill="#9a9ca6" font-size="11.5" font-family="system-ui, -apple-system, sans-serif">Who is using the CPU</text><text x="332" y="198" fill="#5d6268" font-size="11.5" text-anchor="end" font-family="system-ui, -apple-system, sans-serif">3.6 cores</text><rect x="18.0" y="208" width="157.1" height="8" rx="4" fill="#3987e5"/><rect x="176.1" y="208" width="2.0" height="8" rx="0" fill="#d95926"/><rect x="179.1" y="208" width="144.8" height="8" rx="0" fill="#199e70"/><rect x="324.9" y="208" width="7.1" height="8" rx="4" fill="#383835"/><rect x="18" y="226" width="8" height="8" rx="2" fill="#3987e5"/><text x="30" y="234" fill="#9a9ca6" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Agents 1.8</text><rect x="99.19999999999999" y="226" width="8" height="8" rx="2" fill="#d95926"/><text x="111.19999999999999" y="234" fill="#9a9ca6" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Paseo 0.0</text><rect x="174.38" y="226" width="8" height="8" rx="2" fill="#199e70"/><text x="186.38" y="234" fill="#9a9ca6" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">macOS 1.7</text><rect x="249.56" y="226" width="8" height="8" rx="2" fill="#383835"/><text x="261.56" y="234" fill="#9a9ca6" font-size="10" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">Other 0.1</text><text x="18" y="262" fill="#eef0f3" font-size="13" font-weight="600" font-family="system-ui, -apple-system, sans-serif">Build the iOS app</text><text x="332" y="262" fill="#eef0f3" font-size="13" text-anchor="end" font-family="system-ui, -apple-system, sans-serif">1.1 cores</text><text x="18" y="277" fill="#5d6268" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">claude · swift-frontend · 106 processes</text><text x="18" y="298" fill="#eef0f3" font-size="13" font-weight="600" font-family="system-ui, -apple-system, sans-serif">Fix the load pill</text><text x="332" y="298" fill="#eef0f3" font-size="13" text-anchor="end" font-family="system-ui, -apple-system, sans-serif">0.7 cores</text><text x="18" y="313" fill="#5d6268" font-size="10.5" font-family="ui-monospace, SFMono-Regular, Menlo, monospace">claude · node · 29 processes</text>
+  </g>
+  <g transform="translate(584, 376)" font-family="ui-monospace, SFMono-Regular, Menlo, monospace" font-size="11">
+    <rect x="0" y="0" width="350" height="40" rx="11" fill="#18201c" stroke="#23302a"/>
+    <path d="M15 20 h4 l3 -6 l4 12 l3 -6 h4" fill="none" stroke="#9fd8b5" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="42" y="24.5" fill="#9fd8b5" font-size="11" >machine_status → saturated · yours 0.7 cores</text>
+  </g>
+</svg>

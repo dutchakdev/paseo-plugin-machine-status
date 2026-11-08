@@ -11,6 +11,7 @@ const base: ProcessEvidence = {
   memoryBytes: 50 * 1024 * 1024,
   elapsedSeconds: 3600,
   elapsed: "01:00:00",
+  cpuSeconds: null,
   cwd: "/",
   parents: [{ pid: 1, name: "launchd" }],
   children: [],
@@ -18,7 +19,7 @@ const base: ProcessEvidence = {
   isAppleSystemBinary: false,
   machine: {
     cores: 8,
-    loadPercent: 30,
+    usagePercent: 30,
     pressurePercent: 33,
     swapUsedBytes: 0,
     swapTotalBytes: 2 * GB,
@@ -134,6 +135,70 @@ describe("classify: sustained load", () => {
     const system = classify({ ...xprotect, elapsedSeconds: 7200, elapsed: "02:00:00" });
     expect(system.headline).toContain("not something to kill");
     expect(system.advice.join(" ")).not.toContain("terminate");
+  });
+});
+
+describe("classify: a burst on a long-lived process", () => {
+  /** Finder on 2026-11-08: 99.1% CPU, alive 3 days 5 hours, 13,913 s of CPU in total. */
+  const finder: ProcessEvidence = {
+    ...base,
+    name: "Finder",
+    command: "/System/Library/CoreServices/Finder.app/Contents/MacOS/Finder",
+    cpuPercent: 99.1,
+    elapsedSeconds: 278_140,
+    elapsed: "03-05:15:40",
+    cpuSeconds: 13_913.55,
+    parents: [{ pid: 1, name: "launchd" }],
+    isAppleSystemBinary: true,
+  };
+
+  it("does not call three days of uptime three days of load", () => {
+    const verdict = classify(finder);
+    expect(verdict.state).toBe("recent-burst");
+    expect(verdict.headline).not.toContain("well past startup");
+  });
+
+  it("states the lifetime average and the ceiling it implies", () => {
+    const findings = classify(finder).findings.join(" ");
+    expect(findings).toContain("averaged 5%");
+    expect(findings).toContain("at most 3h 53m");
+  });
+
+  it("asks for a second look before any action", () => {
+    expect(classify(finder).advice.join(" ")).toContain("Look again");
+    expect(classify(finder).concern).toBe("watch");
+  });
+
+  it("keeps calling a process that always runs hot sustained", () => {
+    const hot = classify({ ...base, name: "node", cpuPercent: 92, elapsedSeconds: 7_200, elapsed: "02:00:00", cpuSeconds: 6_300 });
+    expect(hot.state).toBe("sustained-load");
+    expect(hot.findings.join(" ")).toContain("averaged 88% over its whole life");
+  });
+
+  it("falls back to the snapshot rule when CPU time is unknown", () => {
+    expect(classify({ ...finder, cpuSeconds: null }).state).toBe("sustained-load");
+  });
+});
+
+describe("classify: the agent behind a process", () => {
+  it("names the agent from its id, even under a name nothing would recognise", () => {
+    const verdict = classify({ ...base, name: "frida-helper", agent: { title: "Hook the app", provider: "opencode", inTree: true } });
+    expect(verdict.kind).toBe("agent-spawned");
+    expect(verdict.findings.join(" ")).toContain('the agent "Hook the app" (opencode)');
+  });
+
+  it("warns when a process has outlived its place under the agent", () => {
+    const verdict = classify({
+      ...base,
+      name: "frida-helper",
+      cpuPercent: 90,
+      elapsedSeconds: 7_200,
+      elapsed: "02:00:00",
+      parents: [{ pid: 1, name: "launchd" }],
+      agent: { title: "", provider: "opencode", inTree: false },
+    });
+    expect(verdict.findings.join(" ")).toContain("ending the agent will not stop it");
+    expect(verdict.advice.join(" ")).toContain("rather than by closing the agent");
   });
 });
 

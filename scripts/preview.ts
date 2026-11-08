@@ -32,7 +32,7 @@ const INK = {
 const machine = {
   hostname: "mac.local",
   platform: "Darwin 27.0.0 (arm64) · up 5d 11h",
-  cpu: { cores: 8, loadAvg1: 2.31, loadAvg5: 1.98, loadAvg15: 1.75, loadPercent: 28.9 },
+  cpu: { cores: 8, loadAvg1: 2.31, loadAvg5: 1.98, loadAvg15: 1.75, loadPercent: 28.9, usagePercent: 29.4 },
   memory: { totalBytes: 16 * GB, usedBytes: 11.0 * GB, appBytes: 5.6 * GB, wiredBytes: 2.1 * GB, compressedBytes: 3.3 * GB, pressurePercent: 37 },
   swap: { totalBytes: 2 * GB, usedBytes: 1.2 * GB },
   disk: { usedPercent: 15, freeBytes: 143.8 * GB },
@@ -109,12 +109,12 @@ parts.push(
 
 /* ----------------------------------------------------------------- tiles -- */
 
-const cpuSeverity = severityOf(machine.cpu.loadPercent);
+const cpuSeverity = severityOf(machine.cpu.usagePercent);
 const memorySeverity = severityOf(machine.memory.pressurePercent, 80, 92);
 const diskSeverity = severityOf(machine.disk.usedPercent, 85, 95);
 
 const tiles = [
-  { label: "CPU", colour: palette.series[0], meta: `${machine.cpu.cores} cores`, value: machine.cpu.loadAvg1.toFixed(2), suffix: "load, 1 min", severity: cpuSeverity, footer: `5 min ${machine.cpu.loadAvg5.toFixed(2)} · 15 min ${machine.cpu.loadAvg15.toFixed(2)} · OK`, series: wave(0, 30, 22, 40), max: 100 },
+  { label: "CPU", colour: palette.series[0], meta: `${machine.cpu.cores} cores`, value: formatPercent(machine.cpu.usagePercent), suffix: "in use", severity: cpuSeverity, footer: `load ${machine.cpu.loadAvg1.toFixed(2)} · OK`, series: wave(0, 30, 22, 40), max: 100 },
   { label: "MEMORY", colour: palette.series[1], meta: formatBytes(machine.memory.totalBytes), value: formatPercent(machine.memory.pressurePercent), suffix: "pressure", severity: memorySeverity, footer: `${formatBytes(machine.memory.usedBytes)} used · OK`, series: wave(2.2, 37, 8, 40), max: 100 },
   { label: "SWAP", colour: palette.series[2], meta: formatBytes(machine.swap.totalBytes), value: formatBytes(machine.swap.usedBytes), suffix: "in use", severity: "good" as const, footer: `${formatBytes(machine.swap.totalBytes - machine.swap.usedBytes)} free`, series: wave(4.1, 60, 10, 40), max: 100 },
   { label: "DISK", colour: palette.series[3], meta: "/", value: formatPercent(machine.disk.usedPercent), suffix: "used", severity: diskSeverity, footer: `${formatBytes(machine.disk.freeBytes)} free`, series: null, max: 100 },
@@ -156,7 +156,7 @@ function chartCard(x: number, title: string, badge: string): number {
   return x + 16 + plotPad;
 }
 
-const cpuPlotX = chartCard(contentX, "CPU LOAD OVER TIME", `${formatPercent(machine.cpu.loadPercent)} · OK`);
+const cpuPlotX = chartCard(contentX, "CPU USAGE OVER TIME", `${formatPercent(machine.cpu.usagePercent)} · OK`);
 const cpuPlotW = CHART_W - 32 - plotPad;
 const plotY = chartsY + 46;
 const plotH = 108;

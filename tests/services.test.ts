@@ -1,3 +1,4 @@
+import type { PaseoAgentListResult } from "@getpaseo/client";
 import { describe, expect, it } from "vitest";
 import {
   binaryMatchesProvider,
@@ -239,7 +240,23 @@ describe("matchAgentRoots", () => {
   });
 });
 
+/** One agent as the SDK lists it; the field names come from the SDK, so a rename breaks the test. */
+type Snapshot = PaseoAgentListResult["entries"][number]["agent"];
+
 describe("normalizeAgents", () => {
+  it("unwraps the entries paseo.agents.list() returns in a plugin", () => {
+    // PaseoAgentListResult wraps each agent as { agent }. Reading the wrapper
+    // found no provider and dropped every agent, so ports and CPU were never
+    // attributed through the SDK; only the CLI's flat list worked.
+    const snapshots: Pick<Snapshot, "id" | "provider" | "cwd" | "title" | "status">[] = [
+      { id: "34252ece-ceec-4e91-aede-fa0482a09362", provider: "claude", cwd: "/tmp/w", title: "Call machine_status", status: "running" },
+    ];
+    const listed = { requestId: "r", entries: snapshots.map((agent) => ({ agent })), pageInfo: { hasMore: false, nextCursor: null } };
+    expect(normalizeAgents(listed)).toEqual([
+      { id: "34252ece-ceec-4e91-aede-fa0482a09362", provider: "claude", cwd: "/tmp/w", title: "Call machine_status", status: "running" },
+    ]);
+  });
+
   it("reads the daemon's documented shape", () => {
     const agents = normalizeAgents({
       agents: [{ id: "1", provider: "claude", cwd: "/w", title: "T", status: "running" }],

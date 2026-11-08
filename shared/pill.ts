@@ -18,29 +18,32 @@ const show = (value: number | null): string =>
 /**
  * Reduces the machine to what fits beside a text field.
  *
- * CPU load and memory pressure are the two numbers that change while an agent
- * works, and they fail in different ways: one saturates, the other swaps. Both
- * are shown; the colour follows whichever is worse, because a pill has room for
- * one colour and the user needs to know that something is wrong before knowing
- * which one.
+ * CPU utilisation and memory pressure are the two numbers that change while an
+ * agent works, and they fail in different ways: one saturates, the other swaps.
+ * Both are shown; the colour follows whichever is worse, because a pill has room
+ * for one colour and the user needs to know that something is wrong before
+ * knowing which one.
+ *
+ * The CPU figure is utilisation, never load average: load per core is a queue
+ * length with no ceiling, and it once put "6337%" in this pill.
  */
-export function pillReading(cpuLoadPercent: number, pressurePercent: number | null): PillReading {
-  const cpu = cpuSeverity(cpuLoadPercent);
+export function pillReading(cpuUsagePercent: number | null, pressurePercent: number | null): PillReading {
+  const cpu = cpuSeverity(cpuUsagePercent);
   const memory = memorySeverity(pressurePercent);
   return {
-    text: `${show(cpuLoadPercent)} · ${show(pressurePercent)}`,
+    text: `${show(cpuUsagePercent)} · ${show(pressurePercent)}`,
     severity: RANK[cpu] >= RANK[memory] ? cpu : memory,
-    label: `Machine load: CPU ${show(cpuLoadPercent)}, memory ${show(pressurePercent)}`,
+    label: `Machine load: CPU ${show(cpuUsagePercent)}, memory ${show(pressurePercent)}`,
   };
 }
 
 /**
  * The thresholds the pill colours by, shared with its card so the two never
- * disagree about the same number. CPU load reads as utilisation; memory pressure
- * keeps the higher thresholds the pill has always used.
+ * disagree about the same number. CPU is utilisation; memory pressure keeps the
+ * higher thresholds the pill has always used.
  */
-export function cpuSeverity(loadPercent: number | null): Severity {
-  return severityOf(loadPercent);
+export function cpuSeverity(usagePercent: number | null): Severity {
+  return severityOf(usagePercent);
 }
 
 export function memorySeverity(pressurePercent: number | null): Severity {

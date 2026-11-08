@@ -4,9 +4,10 @@ import type { PluginHandlerContext } from "@getpaseo/plugin/server";
 import type { z } from "zod";
 import { describeError, run, tryRun } from "./exec";
 import type { explainProcess } from "../shared/explain";
+import { listAgents, ownersByPid, readAgentIds } from "./attribution";
 import { classify, type ProcessEvidence } from "./explain-rules";
 import { readMetricsHandler } from "./metrics";
-import { ancestorsOf, parseElapsedSeconds, parsePsTable, processName, type RawProcess } from "./processes";
+import { ancestorsOf, parseElapsedSeconds, parsePsTable, processName, PS_ARGS, type RawProcess } from "./processes";
 import { readServicesHandler } from "./services";
 
 type Output = z.output<typeof explainProcess.output>;
@@ -23,11 +24,38 @@ function childrenOf(pid: number, table: readonly RawProcess[]): RawProcess[] {
   return table.filter((entry) => entry.ppid === pid);
 }
 
+/**
+ * The agent a process belongs to, by the id in its own or an ancestor's
+ * environment, and whether the daemon is still among its ancestors.
+ */
+async function agentOf(
+  pid: number,
+  table: readonly RawProcess[],
+  context: PluginHandlerContext,
+): Promise<ProcessEvidence["agent"]> {
+  try {
+    const agents = await listAgents(context.paseo);
+    if (agents.length === 0) return null;
+    const chain = [...ancestorsOf(pid, table)].filter((entry) => entry > 1);
+    const envIds = await readAgentIds(chain);
+    const owner = ownersByPid({
+      table: table.filter((entry) => chain.includes(entry.pid)),
+      envIds,
+      agents,
+      inheritedId: process.env.PASEO_AGENT_ID ?? null,
+    }).get(pid);
+    if (!owner) return null;
+    return { title: owner.title, provider: owner.provider, inTree: chain.includes(process.ppid) };
+  } catch {
+    return null;
+  }
+}
+
 export async function explainProcessHandler(
   { pid }: { pid: number },
   context: PluginHandlerContext,
 ): Promise<Output> {
-  const table = parsePsTable(await run("/bin/ps", ["-Ao", "pid=,ppid=,pcpu=,rss=,comm="], 10_000));
+  const table = parsePsTable(await run("/bin/ps", [...PS_ARGS], 10_000));
   const self = table.find((entry) => entry.pid === pid);
 
   if (!self) {
@@ -54,6 +82,7 @@ export async function explainProcessHandler(
   ]);
 
   const children = childrenOf(pid, table);
+  const agent = await agentOf(pid, table, context);
   const childPids = new Set([pid, ...children.map((child) => child.pid)]);
 
   const evidence: ProcessEvidence = {
@@ -63,7 +92,8 @@ export async function explainProcessHandler(
     cpuPercent: self.cpuPercent,
     memoryBytes: self.memoryBytes,
     elapsed: elapsedRaw?.trim() ?? null,
-    elapsedSeconds: elapsedRaw ? parseElapsedSeconds(elapsedRaw) : null,
+    elapsedSeconds: self.elapsedSeconds ?? (elapsedRaw ? parseElapsedSeconds(elapsedRaw) : null),
+    cpuSeconds: self.cpuSeconds ?? null,
     cwd,
     parents: [...ancestorsOf(pid, table)]
       .filter((entry) => entry !== pid)
@@ -77,9 +107,10 @@ export async function explainProcessHandler(
       .filter((port) => port.pid !== null && childPids.has(port.pid))
       .map((port) => ({ port: port.port, protocol: port.protocol, scope: port.scope })),
     isAppleSystemBinary: /^\/(System|usr\/libexec|usr\/sbin|Library\/Apple)\//.test(self.command),
+    agent,
     machine: {
       cores: metrics.cpu.cores,
-      loadPercent: metrics.cpu.loadPercent,
+      usagePercent: metrics.cpu.usagePercent,
       pressurePercent: metrics.memory.pressurePercent,
       swapUsedBytes: metrics.swap.usedBytes,
       swapTotalBytes: metrics.swap.totalBytes,

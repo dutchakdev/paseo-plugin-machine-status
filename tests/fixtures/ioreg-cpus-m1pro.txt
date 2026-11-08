@@ -1,0 +1,278 @@
++-o cpu0@0  <class IOPlatformDevice, id 0x10000027e, registered, matched, active, busy 0 (4 ms), retain 8>
+    {
+      "fixed-frequency" = <00366e0100000000>
+      "logical-cluster-id" = 0
+      "coresight-reg" = <0000011002000000c800030000000000>
+      "cluster-core-id" = <00000000>
+      "die-id" = <00000000>
+      "state" = <"running">
+      "clock-frequency" = <00366e0100000000>
+      "l2-cache-size" = <00004000>
+      "interrupt-parent" = <82000000>
+      "function-error_handler" = <2b0000004872724500000000>
+      "interrupts" = <6e000000>
+      "timebase-frequency" = <00366e0100000000>
+      "logical-cpu-id" = 0
+      "cpu-impl-reg" = <00000510020000000890000000000000>
+      "function-enable_core" = <9900000065726f4301000000>
+      "cluster-id" = <00000000>
+      "l2-cache-id" = <00000000>
+      "IOInterruptControllers" = ("IOInterruptController00000082")
+      "memory-frequency" = <00366e0100000000>
+      "cpm-impl-reg" = <0000e410020000001090000000000000>
+      "peripheral-frequency" = <00366e0100000000>
+      "AAPL,phandle" = <1a000000>
+      "cpu-id" = <00000000>
+      "name" = <"cpu0">
+      "cluster-type" = <"E">
+      "no-aic-ipi-required" = <>
+      "device_type" = <"cpu">
+      "compatible" = <"apple,icestorm","ARM,v8">
+      "die-cluster-id" = <00000000>
+      "reg-private" = <0000011002000000>
+      "reg" = <00000000>
+      "acc-impl-reg" = <0000f010020000008800040000000000>
+      "bus-frequency" = <00366e0100000000>
+      "function-cpu_idle" = <9900000049757063>
+      "IOInterruptSpecifiers" = (<6e000000>)
+    }
+    
+
++-o cpu1@1  <class IOPlatformDevice, id 0x10000027f, registered, matched, active, busy 0 (88 ms), retain 8>
+    {
+      "die-cluster-id" = <00000000>
+      "cluster-type" = <"E">
+      "cluster-core-id" = <01000000>
+      "IOInterruptSpecifiers" = (<71000000>)
+      "AAPL,phandle" = <1b000000>
+      "cpu-id" = <01000000>
+      "acc-impl-reg" = <0000f010020000008800040000000000>
+      "logical-cluster-id" = 0
+      "IOInterruptControllers" = ("IOInterruptController00000082")
+      "no-aic-ipi-required" = <>
+      "l2-cache-size" = <00004000>
+      "function-error_handler" = <2b0000004872724501000000>
+      "interrupt-parent" = <82000000>
+      "name" = <"cpu1">
+      "die-id" = <00000000>
+      "l2-cache-id" = <00000000>
+      "compatible" = <"apple,icestorm","ARM,v8">
+      "interrupts" = <71000000>
+      "reg-private" = <0000111002000000>
+      "state" = <"waiting">
+      "function-enable_core" = <9900000065726f4302000000>
+      "cluster-id" = <00000000>
+      "cpu-impl-reg" = <00001510020000000890000000000000>
+      "function-cpu_idle" = <9900000049757063>
+      "coresight-reg" = <0000111002000000c800030000000000>
+      "device_type" = <"cpu">
+      "logical-cpu-id" = 1
+      "reg" = <01000000>
+      "cpm-impl-reg" = <0000e410020000001090000000000000>
+    }
+    
+
++-o cpu2@100  <class IOPlatformDevice, id 0x100000280, registered, matched, active, busy 0 (371 ms), retain 8>
+    {
+      "die-cluster-id" = <01000000>
+      "cluster-type" = <"P">
+      "cluster-core-id" = <00000000>
+      "IOInterruptSpecifiers" = (<8d000000>)
+      "AAPL,phandle" = <1c000000>
+      "cpu-id" = <02000000>
+      "acc-impl-reg" = <0000f011020000008800040000000000>
+      "logical-cluster-id" = 1
+      "IOInterruptControllers" = ("IOInterruptController00000082")
+      "no-aic-ipi-required" = <>
+      "l2-cache-size" = <00008000>
+      "function-error_handler" = <2b0000004872724502000000>
+      "interrupt-parent" = <82000000>
+      "name" = <"cpu2">
+      "die-id" = <00000000>
+      "l2-cache-id" = <00000000>
+      "compatible" = <"apple,firestorm","ARM,v8">
+      "interrupts" = <8d000000>
+      "reg-private" = <0000011102000000>
+      "state" = <"waiting">
+      "function-enable_core" = <9900000065726f4304000000>
+      "cluster-id" = <01000000>
+      "cpu-impl-reg" = <00000511020000000890000000000000>
+      "function-cpu_idle" = <9900000049757063>
+      "coresight-reg" = <0000011102000000c800030000000000>
+      "device_type" = <"cpu">
+      "logical-cpu-id" = 2
+      "reg" = <00010000>
+      "cpm-impl-reg" = <0000e411020000001090000000000000>
+    }
+    
+
++-o cpu3@101  <class IOPlatformDevice, id 0x100000281, registered, matched, active, busy 0 (118 ms), retain 8>
+    {
+      "die-cluster-id" = <01000000>
+      "cluster-type" = <"P">
+      "cluster-core-id" = <01000000>
+      "IOInterruptSpecifiers" = (<90000000>)
+      "AAPL,phandle" = <1d000000>
+      "cpu-id" = <03000000>
+      "acc-impl-reg" = <0000f011020000008800040000000000>
+      "logical-cluster-id" = 1
+      "IOInterruptControllers" = ("IOInterruptController00000082")
+      "no-aic-ipi-required" = <>
+      "l2-cache-size" = <00008000>
+      "function-error_handler" = <2b0000004872724503000000>
+      "interrupt-parent" = <82000000>
+      "name" = <"cpu3">
+      "die-id" = <00000000>
+      "l2-cache-id" = <00000000>
+      "compatible" = <"apple,firestorm","ARM,v8">
+      "interrupts" = <90000000>
+      "reg-private" = <0000111102000000>
+      "state" = <"waiting">
+      "function-enable_core" = <9900000065726f4308000000>
+      "cluster-id" = <01000000>
+      "cpu-impl-reg" = <00001511020000000890000000000000>
+      "function-cpu_idle" = <9900000049757063>
+      "coresight-reg" = <0000111102000000c800030000000000>
+      "device_type" = <"cpu">
+      "logical-cpu-id" = 3
+      "reg" = <01010000>
+      "cpm-impl-reg" = <0000e411020000001090000000000000>
+    }
+    
+
++-o cpu4@102  <class IOPlatformDevice, id 0x100000282, registered, matched, active, busy 0 (89 ms), retain 8>
+    {
+      "die-cluster-id" = <01000000>
+      "cluster-type" = <"P">
+      "cluster-core-id" = <02000000>
+      "IOInterruptSpecifiers" = (<93000000>)
+      "AAPL,phandle" = <1e000000>
+      "cpu-id" = <04000000>
+      "acc-impl-reg" = <0000f011020000008800040000000000>
+      "logical-cluster-id" = 1
+      "IOInterruptControllers" = ("IOInterruptController00000082")
+      "no-aic-ipi-required" = <>
+      "l2-cache-size" = <00008000>
+      "function-error_handler" = <2b0000004872724504000000>
+      "interrupt-parent" = <82000000>
+      "name" = <"cpu4">
+      "die-id" = <00000000>
+      "l2-cache-id" = <00000000>
+      "compatible" = <"apple,firestorm","ARM,v8">
+      "interrupts" = <93000000>
+      "reg-private" = <0000211102000000>
+      "state" = <"waiting">
+      "function-enable_core" = <9900000065726f4310000000>
+      "cluster-id" = <01000000>
+      "cpu-impl-reg" = <00002511020000000890000000000000>
+      "function-cpu_idle" = <9900000049757063>
+      "coresight-reg" = <0000211102000000c800030000000000>
+      "device_type" = <"cpu">
+      "logical-cpu-id" = 4
+      "reg" = <02010000>
+      "cpm-impl-reg" = <0000e411020000001090000000000000>
+    }
+    
+
++-o cpu6@200  <class IOPlatformDevice, id 0x100000283, registered, matched, active, busy 0 (89 ms), retain 8>
+    {
+      "die-cluster-id" = <02000000>
+      "cluster-type" = <"P">
+      "cluster-core-id" = <00000000>
+      "IOInterruptSpecifiers" = (<b2000000>)
+      "AAPL,phandle" = <20000000>
+      "cpu-id" = <06000000>
+      "acc-impl-reg" = <0000f012020000008800040000000000>
+      "logical-cluster-id" = 2
+      "IOInterruptControllers" = ("IOInterruptController00000082")
+      "no-aic-ipi-required" = <>
+      "l2-cache-size" = <00008000>
+      "function-error_handler" = <2b0000004872724506000000>
+      "interrupt-parent" = <82000000>
+      "name" = <"cpu6">
+      "die-id" = <00000000>
+      "l2-cache-id" = <00000000>
+      "compatible" = <"apple,firestorm","ARM,v8">
+      "interrupts" = <b2000000>
+      "reg-private" = <0000011202000000>
+      "state" = <"waiting">
+      "function-enable_core" = <9900000065726f4340000000>
+      "cluster-id" = <02000000>
+      "cpu-impl-reg" = <00000512020000000890000000000000>
+      "function-cpu_idle" = <9900000049757063>
+      "coresight-reg" = <0000011202000000c800030000000000>
+      "device_type" = <"cpu">
+      "logical-cpu-id" = 5
+      "reg" = <00020000>
+      "cpm-impl-reg" = <0000e412020000001090000000000000>
+    }
+    
+
++-o cpu7@201  <class IOPlatformDevice, id 0x100000284, registered, matched, active, busy 0 (0 ms), retain 8>
+    {
+      "die-cluster-id" = <02000000>
+      "cluster-type" = <"P">
+      "cluster-core-id" = <01000000>
+      "IOInterruptSpecifiers" = (<b5000000>)
+      "AAPL,phandle" = <21000000>
+      "cpu-id" = <07000000>
+      "acc-impl-reg" = <0000f012020000008800040000000000>
+      "logical-cluster-id" = 2
+      "IOInterruptControllers" = ("IOInterruptController00000082")
+      "no-aic-ipi-required" = <>
+      "l2-cache-size" = <00008000>
+      "function-error_handler" = <2b0000004872724507000000>
+      "interrupt-parent" = <82000000>
+      "name" = <"cpu7">
+      "die-id" = <00000000>
+      "l2-cache-id" = <00000000>
+      "compatible" = <"apple,firestorm","ARM,v8">
+      "interrupts" = <b5000000>
+      "reg-private" = <0000111202000000>
+      "state" = <"waiting">
+      "function-enable_core" = <9900000065726f4380000000>
+      "cluster-id" = <02000000>
+      "cpu-impl-reg" = <00001512020000000890000000000000>
+      "function-cpu_idle" = <9900000049757063>
+      "coresight-reg" = <0000111202000000c800030000000000>
+      "device_type" = <"cpu">
+      "logical-cpu-id" = 6
+      "reg" = <01020000>
+      "cpm-impl-reg" = <0000e412020000001090000000000000>
+    }
+    
+
++-o cpu8@202  <class IOPlatformDevice, id 0x100000285, registered, matched, active, busy 0 (199 ms), retain 8>
+    {
+      "die-cluster-id" = <02000000>
+      "cluster-type" = <"P">
+      "cluster-core-id" = <02000000>
+      "IOInterruptSpecifiers" = (<b8000000>)
+      "AAPL,phandle" = <22000000>
+      "cpu-id" = <08000000>
+      "acc-impl-reg" = <0000f012020000008800040000000000>
+      "logical-cluster-id" = 2
+      "IOInterruptControllers" = ("IOInterruptController00000082")
+      "no-aic-ipi-required" = <>
+      "l2-cache-size" = <00008000>
+      "function-error_handler" = <2b0000004872724508000000>
+      "interrupt-parent" = <82000000>
+      "name" = <"cpu8">
+      "die-id" = <00000000>
+      "l2-cache-id" = <00000000>
+      "compatible" = <"apple,firestorm","ARM,v8">
+      "interrupts" = <b8000000>
+      "reg-private" = <0000211202000000>
+      "state" = <"waiting">
+      "function-enable_core" = <9900000065726f4300010000>
+      "cluster-id" = <02000000>
+      "cpu-impl-reg" = <00002512020000000890000000000000>
+      "function-cpu_idle" = <9900000049757063>
+      "coresight-reg" = <0000211202000000c800030000000000>
+      "device_type" = <"cpu">
+      "logical-cpu-id" = 7
+      "reg" = <02020000>
+      "cpm-impl-reg" = <0000e412020000001090000000000000>
+    }
+    
+

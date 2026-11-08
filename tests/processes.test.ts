@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   ancestorsOf,
+  burstCeilingSeconds,
   guardedPids,
+  lifetimeCpuPercent,
+  parseCpuTime,
   parseElapsedSeconds,
   parsePsTable,
   processName,
@@ -44,6 +47,95 @@ describe("parsePsTable", () => {
 
   it("skips lines that are not process rows", () => {
     expect(parsePsTable("  PID  PPID %CPU   RSS COMMAND\n\n")).toHaveLength(0);
+  });
+});
+
+/**
+ * Captured verbatim from `ps -Ao pid=,ppid=,pcpu=,rss=,time=,etime=,comm=` on an
+ * M1 Pro on 2026-11-08 (two runs a minute apart; every line is unedited).
+ */
+const PS_TIMED = `    1     0   0.1  18176 3387:08.30 80-20:56:52 /sbin/launchd
+ 1835     1   0.0    992   0:00.12       24:30 /System/Library/PrivateFrameworks/AssetCacheServices.framework/Versions/A/XPCServices/AssetCacheLocatorService.xpc/Contents/MacOS/AssetCacheLocatorService
+17365     1   0.0  11840   6:35.69 11-05:17:30 Paseo Supervisor
+23231 17365  43.1 640912 214:14.20 07-00:13:17 Paseo Daemon
+53542     1  99.1 366080 231:53.55 03-05:15:40 /System/Library/CoreServices/Finder.app/Contents/MacOS/Finder
+59130  3635 358.3 1293664   0:06.68       00:01 kicad-cli
+`;
+
+describe("parsePsTable with CPU time and elapsed time", () => {
+  const table = parsePsTable(PS_TIMED);
+  const row = (pid: number) => table.find((entry) => entry.pid === pid)!;
+
+  it("reads every row, including commands with spaces", () => {
+    expect(table).toHaveLength(6);
+    expect(row(23231).command).toBe("Paseo Daemon");
+    expect(row(17365).command).toBe("Paseo Supervisor");
+  });
+
+  it("reads cumulative CPU time, which macOS prints as minutes past sixty", () => {
+    // 3387 minutes is 56 hours; there is no hours field to rely on.
+    expect(row(1).cpuSeconds).toBeCloseTo(3387 * 60 + 8.3);
+    expect(row(1835).cpuSeconds).toBeCloseTo(0.12);
+  });
+
+  it("reads elapsed time in every width ps uses", () => {
+    expect(row(1).elapsedSeconds).toBe(80 * 86_400 + 20 * 3_600 + 56 * 60 + 52);
+    expect(row(1835).elapsedSeconds).toBe(24 * 60 + 30);
+    expect(row(59130).elapsedSeconds).toBe(1);
+  });
+
+  it("still reads the five-column table, without the time fields", () => {
+    const old = parsePsTable(PS_OUTPUT)[0];
+    expect(old.cpuSeconds).toBeUndefined();
+    expect(old.elapsedSeconds).toBeUndefined();
+  });
+});
+
+describe("parseCpuTime", () => {
+  it("reads minutes, seconds and hundredths", () => {
+    expect(parseCpuTime("231:53.55")).toBeCloseTo(231 * 60 + 53.55);
+    expect(parseCpuTime("0:06.68")).toBeCloseTo(6.68);
+  });
+
+  it("rejects what it was not shown", () => {
+    expect(parseCpuTime("01-02:03:04")).toBeNull();
+    expect(parseCpuTime("")).toBeNull();
+  });
+});
+
+describe("lifetimeCpuPercent", () => {
+  const table = parsePsTable(PS_TIMED);
+  const life = (pid: number) => {
+    const entry = table.find((row) => row.pid === pid)!;
+    return lifetimeCpuPercent(entry.cpuSeconds ?? null, entry.elapsedSeconds ?? null);
+  };
+
+  it("tells a recent burst from a process that always runs hot", () => {
+    // Finder read 99% that minute, yet averaged 5% over three days.
+    expect(life(53542)).toBeCloseTo(4.98, 1);
+  });
+
+  it("can exceed 100% for a process that keeps several cores busy, like pcpu", () => {
+    expect(life(59130)).toBeCloseTo(668, 0);
+  });
+
+  it("has nothing to say without both readings, or before any time has passed", () => {
+    expect(lifetimeCpuPercent(null, 100)).toBeNull();
+    expect(lifetimeCpuPercent(5, null)).toBeNull();
+    expect(lifetimeCpuPercent(5, 0)).toBeNull();
+  });
+});
+
+describe("burstCeilingSeconds", () => {
+  it("bounds how long a process can have run at its current rate by the CPU time it has", () => {
+    // Finder: 13,913.55 s of CPU in total. At 99.1% that is at most 3.9 hours,
+    // whatever its three-day elapsed time suggests.
+    expect(burstCeilingSeconds(231 * 60 + 53.55, 99.1)! / 3_600).toBeCloseTo(3.9, 1);
+  });
+
+  it("does not divide by an idle reading", () => {
+    expect(burstCeilingSeconds(100, 0)).toBeNull();
+    expect(burstCeilingSeconds(null, 50)).toBeNull();
   });
 });
 

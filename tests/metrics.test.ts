@@ -216,6 +216,7 @@ describe("parseMemoryPressure", () => {
 describe("rolling history", () => {
   const sample = (at: string) => ({
     at,
+    cpuUsagePercent: 12,
     cpuLoadPercent: 10,
     pressurePercent: 20,
     appBytes: 1,
@@ -249,7 +250,17 @@ describe("rolling history", () => {
       hostname: "h",
       platform: "p",
       uptimeSeconds: 1,
-      cpu: { cores: 8, loadAvg1: 2, loadAvg5: 2, loadAvg15: 2, loadPercent: 25 },
+      cpu: {
+        cores: 8,
+        loadAvg1: 2,
+        loadAvg5: 2,
+        loadAvg15: 2,
+        loadPercent: 25,
+        usagePercent: 31,
+        coreUsagePercent: [31, 31, 31, 31, 31, 31, 31, 31],
+        coreKinds: new Array(8).fill(null),
+        windowMs: 3_000,
+      },
       memory: {
         totalBytes: 16,
         appBytes: 5,
@@ -267,6 +278,7 @@ describe("rolling history", () => {
     });
     expect(projected).toEqual({
       at: "2026-08-19T16:00:00.000Z",
+      cpuUsagePercent: 31,
       cpuLoadPercent: 25,
       pressurePercent: 33,
       appBytes: 5,
@@ -279,9 +291,10 @@ describe("rolling history", () => {
 
 describe("summarizeHistory", () => {
   const at = (seconds: number) => new Date(Date.UTC(2026, 7, 19, 16, 0, seconds)).toISOString();
-  const sample = (seconds: number, cpu: number, pressure: number | null = 30) => ({
+  const sample = (seconds: number, cpu: number | null, pressure: number | null = 30) => ({
     at: at(seconds),
-    cpuLoadPercent: cpu,
+    cpuUsagePercent: cpu,
+    cpuLoadPercent: cpu ?? 0,
     pressurePercent: pressure,
     appBytes: 1,
     wiredBytes: 2,
@@ -291,9 +304,14 @@ describe("summarizeHistory", () => {
 
   it("separates a spike from a sustained load, which one snapshot cannot", () => {
     const spike = summarizeHistory([sample(0, 10), sample(3, 95), sample(6, 12)]);
-    expect(spike.cpuLoadPercent).toMatchObject({ min: 10, max: 95, last: 12 });
+    expect(spike.cpuUsagePercent).toMatchObject({ min: 10, max: 95, last: 12 });
     // max far above last means it spiked and recovered.
-    expect(spike.cpuLoadPercent!.max - spike.cpuLoadPercent!.last).toBeGreaterThan(50);
+    expect(spike.cpuUsagePercent!.max - spike.cpuUsagePercent!.last).toBeGreaterThan(50);
+  });
+
+  it("skips samples whose utilisation could not be measured", () => {
+    const summary = summarizeHistory([sample(0, null), sample(3, 40), sample(6, 60)]);
+    expect(summary.cpuUsagePercent).toMatchObject({ min: 40, max: 60, avg: 50 });
   });
 
   it("reports the real span between first and last sample", () => {
@@ -312,6 +330,7 @@ describe("summarizeHistory", () => {
   it("returns nulls rather than NaN for an empty history", () => {
     const summary = summarizeHistory([]);
     expect(summary.samples).toBe(0);
+    expect(summary.cpuUsagePercent).toBeNull();
     expect(summary.cpuLoadPercent).toBeNull();
     expect(summary.spanSeconds).toBe(0);
   });

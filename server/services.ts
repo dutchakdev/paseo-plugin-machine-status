@@ -3,12 +3,15 @@ import path from "node:path";
 import type { PluginHandlerContext } from "@getpaseo/plugin/server";
 import type { z } from "zod";
 import { describeError, run, tryRun } from "./exec";
-import { ancestorsOf, parsePsTable, type RawProcess } from "./processes";
+import { envAgentRoots, listAgents, matchAgentRoots, readAgentIds, type AgentRef, type AgentRoot } from "./attribution";
+import { ancestorsOf, cwdOf, parsePsTable, PS_ARGS, type RawProcess } from "./processes";
+
+// Agent-root matching moved beside the CPU attribution that shares it.
+export { binaryMatchesProvider, matchAgentRoots, type AgentRoot } from "./attribution";
 import {
   classifyRelevance,
   friendlyName,
   httpUrlFor,
-  normalizeAgents,
   parseLsofAddress,
   parseNetstatAddress,
   portKey,
@@ -126,70 +129,6 @@ export function descendantsOf(pid: number, table: readonly RawProcess[]): RawPro
   return found;
 }
 
-/**
- * A provider name must match the binary as a whole word, not as a prefix.
- * `ps` on this machine contains AMPDeviceDiscoveryAgent, Campo and
- * CursorUIViewService, all of which a substring test happily reports as the
- * "amp" and "cursor" agents.
- */
-export function binaryMatchesProvider(binary: string, provider: string): boolean {
-  if (provider.length === 0) return false;
-  if (binary === provider) return true;
-  if (!binary.startsWith(provider)) return false;
-  return /^[^a-z0-9]/.test(binary.slice(provider.length));
-}
-
-export interface AgentRoot {
-  pid: number;
-  provider: string;
-  title: string;
-  cwd: string;
-  command: string;
-}
-
-/**
- * Identifies which daemon children are coding agents.
- *
- * Matching on the command name alone does not work: a substring search for
- * "amp" or "cursor" hits AMPDeviceDiscoveryAgent and CursorUIViewService. The
- * reliable signal is structural — Paseo starts each agent as its own child — and
- * it is confirmed against the daemon's own agent list, so anything else under the
- * daemon (esbuild, Paseo's internal helpers, this plugin) is left out.
- */
-export function matchAgentRoots(
-  daemonChildren: readonly (RawProcess & { cwd: string })[],
-  agents: readonly { id: string; provider: string; cwd: string; title: string }[],
-  excluded: ReadonlySet<number>,
-): AgentRoot[] {
-  const roots: AgentRoot[] = [];
-  const claimed = new Set<string>();
-
-  for (const child of daemonChildren) {
-    if (excluded.has(child.pid)) continue;
-    const binary = (child.command.split("/").pop() ?? "").toLowerCase();
-
-    const agent = agents.find(
-      (candidate) =>
-        !claimed.has(candidate.id) &&
-        candidate.provider.length > 0 &&
-        binaryMatchesProvider(binary, candidate.provider) &&
-        // cwd disambiguates two agents of the same provider in different workspaces
-        (candidate.cwd === "" || child.cwd === "" || candidate.cwd === child.cwd),
-    );
-    if (!agent) continue;
-
-    claimed.add(agent.id);
-    roots.push({
-      pid: child.pid,
-      provider: agent.provider,
-      title: agent.title,
-      cwd: child.cwd || agent.cwd,
-      command: child.command,
-    });
-  }
-  return roots;
-}
-
 const SCOPE_WIDTH = { public: 3, lan: 2, local: 1 } as const;
 
 /**
@@ -224,11 +163,6 @@ export function collapseDuplicateBinds<T extends { protocol: string; port: numbe
 /* Collection                                                                   */
 /* -------------------------------------------------------------------------- */
 
-async function cwdOf(pid: number): Promise<string> {
-  const raw = await tryRun("/usr/sbin/lsof", ["-a", "-d", "cwd", "-p", String(pid), "-Fn"], 3_000);
-  const line = raw?.split("\n").find((entry) => entry.startsWith("n"));
-  return line ? line.slice(1) : "";
-}
 
 export async function readServicesHandler(
   _input: unknown,
@@ -247,7 +181,7 @@ export async function readServicesHandler(
     tryRun("/usr/sbin/netstat", ["-an", "-p", "udp"], 8_000),
     tryRun("/usr/sbin/lsof", ["-iTCP", "-sTCP:LISTEN", "-P", "-n", "+c", "0", "-Fpcn"], 8_000),
     tryRun("/usr/sbin/lsof", ["-iUDP", "-P", "-n", "+c", "0", "-Fpcn"], 8_000),
-    run("/bin/ps", ["-Ao", "pid=,ppid=,pcpu=,rss=,comm="], 10_000),
+    run("/bin/ps", [...PS_ARGS], 10_000),
     tryRun("/usr/local/bin/docker", ["ps", "--format", "{{.Names}}\t{{.Image}}\t{{.Ports}}"], 4_000),
   ]);
 
@@ -266,18 +200,26 @@ export async function readServicesHandler(
   const daemonPid = process.ppid;
   const ownChain = ancestorsOf(process.pid, table);
 
-  let agents: ReturnType<typeof normalizeAgents> = [];
+  let agents: AgentRef[] = [];
   try {
-    agents = normalizeAgents(await context.paseo.agents.list());
+    agents = await listAgents(context.paseo);
   } catch (error) {
     notes.push(`Agent list unavailable, so ports are not attributed to agents: ${describeError(error)}`);
   }
 
+  // The agent id in a child's environment names its agent exactly; provider and
+  // cwd matching covers daemons that do not set it.
   const children = table.filter((entry) => entry.ppid === daemonPid);
-  const withCwd = await Promise.all(
-    children.map(async (child) => ({ ...child, cwd: await cwdOf(child.pid) })),
-  );
-  const roots = matchAgentRoots(withCwd, agents, ownChain);
+  const inheritedId = process.env.PASEO_AGENT_ID ?? null;
+  const envIds = agents.length > 0 ? await readAgentIds(children.map((child) => child.pid)) : new Map<number, string>();
+  const envRoots = envAgentRoots(children, envIds, agents, inheritedId).filter((root) => !ownChain.has(root.pid));
+  const claimed = new Set(envRoots.map((root) => root.id));
+  const rest = children.filter((child) => !envRoots.some((root) => root.pid === child.pid));
+  const withCwd = await Promise.all(rest.map(async (child) => ({ ...child, cwd: await cwdOf(child.pid) })));
+  const roots: AgentRoot[] = [
+    ...envRoots,
+    ...matchAgentRoots(withCwd, agents.filter((agent) => !claimed.has(agent.id)), ownChain),
+  ];
 
   /** pid -> the agent it ultimately belongs to. */
   const ownerByPid = new Map<number, AgentRoot>();

@@ -57,7 +57,7 @@ export function executableName(command: string): string {
 }
 
 /** Paths macOS reserves for itself. Nothing under these is development work. */
-const SYSTEM_PREFIXES = [
+export const SYSTEM_PREFIXES = [
   "/System/",
   "/usr/libexec/",
   "/usr/sbin/",
@@ -173,6 +173,8 @@ export function normalizeAgents(
 
   return list
     .filter((entry): entry is Record<string, unknown> => !!entry && typeof entry === "object")
+    // The SDK lists `{ agent }` entries; the CLI lists agents flat.
+    .map((entry) => (entry.agent && typeof entry.agent === "object" ? (entry.agent as Record<string, unknown>) : entry))
     .map((entry) => {
       const config = (entry.config ?? {}) as Record<string, unknown>;
       const provider = String(entry.provider ?? config.provider ?? "");

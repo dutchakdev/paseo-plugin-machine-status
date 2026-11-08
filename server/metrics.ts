@@ -1,5 +1,6 @@
 import os from "node:os";
 import type { MetricsSchema } from "../shared/contracts";
+import { alignCoreKinds, readCoreKinds, sampleCpuUsage } from "./cpu";
 import { run, tryRun } from "./exec";
 import type { z } from "zod";
 
@@ -195,6 +196,7 @@ export type HistorySummary = {
   fromAt: string | null;
   toAt: string | null;
   spanSeconds: number;
+  cpuUsagePercent: Extent | null;
   cpuLoadPercent: Extent | null;
   pressurePercent: Extent | null;
   memoryUsedBytes: Extent | null;
@@ -217,6 +219,9 @@ export function summarizeHistory(samples: readonly HistorySample[]): HistorySumm
     fromAt: first?.at ?? null,
     toAt: last?.at ?? null,
     spanSeconds: span,
+    cpuUsagePercent: extentOf(
+      samples.filter((sample) => sample.cpuUsagePercent !== null).map((sample) => sample.cpuUsagePercent as number),
+    ),
     cpuLoadPercent: extentOf(samples.map((sample) => sample.cpuLoadPercent)),
     pressurePercent: extentOf(
       samples.filter((sample) => sample.pressurePercent !== null).map((sample) => sample.pressurePercent as number),
@@ -240,6 +245,7 @@ export function downsample<T>(samples: readonly T[], count: number): T[] {
 export function toHistorySample(metrics: Omit<Metrics, "history">): HistorySample {
   return {
     at: metrics.collectedAt,
+    cpuUsagePercent: metrics.cpu.usagePercent,
     cpuLoadPercent: metrics.cpu.loadPercent,
     pressurePercent: metrics.memory.pressurePercent,
     appBytes: metrics.memory.appBytes,
@@ -273,7 +279,10 @@ async function collect(): Promise<Omit<Metrics, "history">> {
     );
   }
 
-  const [vmStatRaw, swapRaw, dfRaw, batteryRaw, thermalRaw, pressureRaw] = await Promise.all([
+  // The CPU window, when one has to be opened, overlaps the commands below.
+  const [usage, kinds, vmStatRaw, swapRaw, dfRaw, batteryRaw, thermalRaw, pressureRaw] = await Promise.all([
+    sampleCpuUsage(),
+    readCoreKinds(),
     run("/usr/bin/vm_stat", []),
     run("/usr/sbin/sysctl", ["vm.swapusage"]),
     run("/bin/df", ["-k", "-P", "/"]),
@@ -296,6 +305,10 @@ async function collect(): Promise<Omit<Metrics, "history">> {
       loadAvg5,
       loadAvg15,
       loadPercent: (loadAvg1 / cores) * 100,
+      usagePercent: usage.overall,
+      coreUsagePercent: usage.perCore,
+      coreKinds: alignCoreKinds(kinds, usage.perCore.length),
+      windowMs: usage.windowMs,
     },
     memory: buildMemory(
       parseVmStat(vmStatRaw),

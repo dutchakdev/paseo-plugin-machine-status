@@ -147,6 +147,7 @@ export function ProcessesSection({
           <Text style={[styles.axis, { flex: 1 }]}>PROCESS</Text>
           <Text style={[styles.axis, { width: 64 }]}>PID</Text>
           <Text style={[styles.axis, { width: 56, textAlign: "right" }]}>CPU</Text>
+          <Text style={[styles.axis, { width: 52, textAlign: "right" }]}>AVG</Text>
           <View style={{ width: 120 }} />
           <Text style={[styles.axis, { width: 84, textAlign: "right" }]}>MEMORY</Text>
         </View>
@@ -159,7 +160,9 @@ export function ProcessesSection({
           <Pressable
             key={item.pid}
             accessibilityRole="button"
-            accessibilityLabel={`${item.name}, PID ${item.pid}, ${item.cpuPercent.toFixed(1)} percent CPU, ${formatBytes(item.memoryBytes)}. Opens actions.`}
+            accessibilityLabel={`${item.name}, PID ${item.pid}, ${item.cpuPercent.toFixed(1)} percent CPU${
+              item.lifetimeCpuPercent === null ? "" : `, ${item.lifetimeCpuPercent.toFixed(0)} percent on average since it started`
+            }, ${formatBytes(item.memoryBytes)}. Opens actions.`}
             accessibilityState={{ selected: active, disabled: item.guarded }}
             disabled={item.guarded}
             // A left click opens the same menu, so the actions are reachable
@@ -189,6 +192,11 @@ export function ProcessesSection({
             >
               {item.cpuPercent.toFixed(1)}%
             </Text>
+            {!chrome.compact ? (
+              <Text style={[styles.muted, { width: 52, textAlign: "right", fontVariant: ["tabular-nums"] }]}>
+                {item.lifetimeCpuPercent === null ? "—" : `${item.lifetimeCpuPercent.toFixed(0)}%`}
+              </Text>
+            ) : null}
             <View
               style={{
                 width: chrome.compact ? 48 : 120,
@@ -213,6 +221,12 @@ export function ProcessesSection({
           </Pressable>
         );
       })}
+
+      {!chrome.compact && items.length > 0 ? (
+        <Text style={styles.axis}>
+          AVG is CPU time over the process's whole life. Far below CPU means it became busy recently.
+        </Text>
+      ) : null}
 
       {/* The menu is gone by the time an action finishes, so results land here. */}
       {investigate.isPending ? <Text style={styles.muted}>Gathering evidence…</Text> : null}

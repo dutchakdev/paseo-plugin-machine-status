@@ -33,6 +33,16 @@ describe("pillReading", () => {
     expect(reading.severity).toBe("good");
   });
 
+  it("shows a dash when utilisation could not be measured, never a load figure", () => {
+    expect(pillReading(null, 66).text).toBe("— · 66%");
+  });
+
+  it("cannot read past 100% the way load per core did", () => {
+    // 2026-11-08: load 659 on 8 cores reached the pill as 6337%-8240%. The pill now
+    // takes utilisation, which the sampler bounds; at saturation it reads 100%.
+    expect(pillReading(100, 66)).toMatchObject({ text: "100% · 66%", severity: "critical" });
+  });
+
   it("says which number is which where there is room to", () => {
     expect(pillReading(28, 41).label).toBe("Machine load: CPU 28%, memory 41%");
   });

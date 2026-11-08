@@ -12,8 +12,22 @@ export const CpuSchema = z.object({
   loadAvg1: z.number(),
   loadAvg5: z.number(),
   loadAvg15: z.number(),
-  /** loadAvg1 relative to core count, so 100 means "one runnable thread per core". */
+  /**
+   * loadAvg1 per core: 100 means one runnable thread per core. It is a queue
+   * length, not utilisation, and climbs far past 100 when work waits for a core.
+   */
   loadPercent: z.number(),
+  /**
+   * Share of all cores' time spent not idle over `windowMs`, 0–100, from the
+   * kernel's tick counters. This is the CPU figure; null when no core was listed.
+   */
+  usagePercent: z.number().nullable(),
+  /** The same per core, in the order the OS numbers them. */
+  coreUsagePercent: z.array(z.number().nullable()),
+  /** Efficiency or performance, per core in the same order; null where the hardware does not say. */
+  coreKinds: z.array(z.enum(["efficiency", "performance"]).nullable()),
+  /** How many milliseconds the usage figures cover. */
+  windowMs: z.number(),
 });
 
 export const MemorySchema = z.object({
@@ -60,6 +74,7 @@ export const ThermalSchema = z.object({
 /** One point in the rolling history the charts draw. Kept small: it ships on every poll. */
 export const HistorySampleSchema = z.object({
   at: z.string(),
+  cpuUsagePercent: z.number().nullable(),
   cpuLoadPercent: z.number(),
   pressurePercent: z.number().nullable(),
   appBytes: z.number(),
@@ -135,6 +150,13 @@ export const ProcessSchema = z.object({
   command: z.string(),
   /** True when killing this process would take Paseo itself down. */
   guarded: z.boolean(),
+  /** Seconds since it started; null when ps did not report it. */
+  elapsedSeconds: z.number().nullable(),
+  /**
+   * Its CPU time over its elapsed time, on the pcpu scale. Far below `cpuPercent`
+   * means it became busy recently; close to it means it always runs like this.
+   */
+  lifetimeCpuPercent: z.number().nullable(),
 });
 
 export const listProcesses = defineRpc({
