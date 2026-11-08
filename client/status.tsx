@@ -8,8 +8,11 @@ import { CleanupSection } from "./cleanup";
 import { DockerTab } from "./docker";
 import type { MachineScreenProps } from "./compat";
 import { ContextMenuProvider } from "./menu";
+import { attributeCpu, summarizeOwners } from "../shared/attribution";
 import { readMetrics, type Metrics } from "../shared/contracts";
-import { formatBytes, formatDuration, formatMinutes, formatPercent } from "../shared/format";
+import { formatBytes, formatCores, formatDuration, formatLoad, formatMinutes, formatPercent } from "../shared/format";
+import { CoreStrip } from "./cores";
+import { CpuOwners } from "./owners";
 import { ProcessesSection } from "./processes";
 import { ActionButton, Card, MetricRow, useChromeStyles, type Chrome } from "./ui";
 import {
@@ -49,6 +52,12 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
     queryFn: () => read({}),
     refetchInterval: paused ? false : 3_000,
   });
+  const attribute = useRpc(attributeCpu);
+  const owners = useQuery({
+    queryKey: ["machine-status", "attribution", host.id],
+    queryFn: () => attribute({}),
+    refetchInterval: paused ? false : 5_000,
+  });
   const data = metrics.data;
   const history = data?.history ?? [];
 
@@ -58,7 +67,7 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
   const stackSlots = layout.compact ? 24 : 45;
   const span = spanLabel(history[0]?.at, history[history.length - 1]?.at);
 
-  const cpuSeries = useMemo(() => history.map((sample) => sample.cpuLoadPercent), [history]);
+  const cpuSeries = useMemo(() => history.map((sample) => sample.cpuUsagePercent ?? 0), [history]);
   const pressureSeries = useMemo(
     () => history.map((sample) => sample.pressurePercent ?? 0),
     [history],
@@ -77,7 +86,7 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
   );
 
   // The pill and its card colour by the same thresholds; so does this tab.
-  const cpuSeverity = cpuSeverityOf(data?.cpu.loadPercent ?? null);
+  const cpuSeverity = cpuSeverityOf(data?.cpu.usagePercent ?? null);
   const memorySeverity = memorySeverityOf(data?.memory.pressurePercent ?? null);
   const diskSeverity = severityOf(data?.disk.usedPercent ?? null, 85, 95);
   const swapPercent =
@@ -123,15 +132,14 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
               label="CPU"
               labelColor={palette.series[0]}
               meta={`${data.cpu.cores} cores`}
-              value={data.cpu.loadAvg1.toFixed(2)}
-              valueSuffix="load, 1 min"
+              value={formatPercent(data.cpu.usagePercent)}
+              valueSuffix="in use"
               valueColor={cpuSeverity === "good" ? undefined : STATUS[cpuSeverity]}
               expanded={expanded === "cpu"}
               onPress={() => toggle("cpu")}
               footer={
                 <Text style={styles.muted}>
-                  5 min {data.cpu.loadAvg5.toFixed(2)} · 15 min {data.cpu.loadAvg15.toFixed(2)} ·{" "}
-                  {SEVERITY_LABEL[cpuSeverity]}
+                  load {formatLoad(data.cpu.loadAvg1)} · {SEVERITY_LABEL[cpuSeverity]}
                 </Text>
               }
             >
@@ -213,17 +221,25 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
 
           {expanded === "cpu" ? (
             <DetailCard chrome={chrome} title="CPU · detail" onClose={() => setExpanded(null)}>
-              <MetricRow chrome={chrome} label="Load 1 min" value={data.cpu.loadAvg1.toFixed(2)} />
-              <MetricRow chrome={chrome} label="Load 5 min" value={data.cpu.loadAvg5.toFixed(2)} />
-              <MetricRow chrome={chrome} label="Load 15 min" value={data.cpu.loadAvg15.toFixed(2)} />
+              <CoreStrip chrome={chrome} palette={palette} perCore={data.cpu.coreUsagePercent} kinds={data.cpu.coreKinds} />
               <MetricRow
                 chrome={chrome}
-                label="Per core"
-                value={`${formatPercent(data.cpu.loadPercent)} · ${SEVERITY_LABEL[cpuSeverity]}`}
+                label="In use"
+                value={`${formatPercent(data.cpu.usagePercent)} · ${SEVERITY_LABEL[cpuSeverity]}`}
+              />
+              <MetricRow
+                chrome={chrome}
+                label="Load 1 · 5 · 15 min"
+                value={`${formatLoad(data.cpu.loadAvg1)} · ${formatLoad(data.cpu.loadAvg5)} · ${formatLoad(data.cpu.loadAvg15)}`}
+              />
+              <MetricRow
+                chrome={chrome}
+                label="Threads per core"
+                value={formatLoad(data.cpu.loadAvg1 / data.cpu.cores)}
               />
               <Text style={styles.muted}>
-                Per-core utilisation needs a native call macOS does not expose to the shell, so it is
-                not shown rather than estimated.
+                In use is the share of time the cores were busy, from the kernel's tick counters.
+                Load counts threads running or waiting for a core; above one per core, work queues.
               </Text>
             </DetailCard>
           ) : null}
@@ -292,8 +308,8 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
             <View style={{ flex: 1.15 }}>
               <Card
                 chrome={chrome}
-                title="CPU load over time"
-                subtitle={`${formatPercent(data.cpu.loadPercent)} · ${SEVERITY_LABEL[cpuSeverity]}`}
+                title="CPU usage over time"
+                subtitle={`${formatPercent(data.cpu.usagePercent)} · ${SEVERITY_LABEL[cpuSeverity]}`}
               >
                 <ColumnChart
                   chrome={chrome}
@@ -354,6 +370,15 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
       {/* Bottom band, 360px : 1fr — resources on the left, processes on the right. */}
       <View style={styles.band}>
         <View style={[{ gap: layout.compact ? 10 : 14 }, layout.compact ? null : { width: 360 }]}>
+          {owners.data ? (
+            <Card chrome={chrome} title="Who is using the CPU" subtitle={formatCores(summarizeOwners(owners.data.groups).totalPercent)}>
+              <CpuOwners chrome={chrome} palette={palette} data={owners.data} agentLimit={8} />
+              <Text style={styles.axis}>
+                By the agent id Paseo puts in each agent's environment, which the processes it starts
+                inherit. ps %CPU, averaged over about a minute.
+              </Text>
+            </Card>
+          ) : null}
           {data ? (
             <Card chrome={chrome} title="Disk & swap" subtitle={data.disk.mountedOn}>
               <View style={{ gap: 6 }}>

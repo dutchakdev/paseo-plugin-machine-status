@@ -1,4 +1,5 @@
 import type { Explanation } from "../shared/explain";
+import { formatDuration } from "../shared/format";
 
 /**
  * Turns gathered evidence into a verdict.
@@ -17,14 +18,22 @@ export interface ProcessEvidence {
   memoryBytes: number;
   elapsedSeconds: number | null;
   elapsed: string | null;
+  /** Cumulative CPU time across its threads; null when ps did not report it. */
+  cpuSeconds: number | null;
   cwd: string | null;
   parents: { pid: number; name: string }[];
   children: { pid: number; name: string; cpuPercent: number }[];
   ports: { port: number; protocol: string; scope: string }[];
   isAppleSystemBinary: boolean;
+  /**
+   * The agent this process belongs to by the id in its environment, and whether
+   * it still sits under that agent's process tree. Null when no agent owns it.
+   */
+  agent?: { title: string; provider: string; inTree: boolean } | null;
   machine: {
     cores: number;
-    loadPercent: number;
+    /** Utilisation across all cores, 0–100; null when it could not be measured. */
+    usagePercent: number | null;
     pressurePercent: number | null;
     swapUsedBytes: number;
     swapTotalBytes: number;
@@ -77,7 +86,7 @@ export function describeKnown(name: string): { what: string; trigger?: string } 
 function kindOf(evidence: ProcessEvidence): Explanation["kind"] {
   // Structural first: anything under the Paseo daemon was started by an agent,
   // whatever it happens to be called.
-  if (evidence.parents.some((parent) => parent.name === "Paseo Daemon")) return "agent-spawned";
+  if (evidence.agent || evidence.parents.some((parent) => parent.name === "Paseo Daemon")) return "agent-spawned";
   if (evidence.isAppleSystemBinary) return "apple-system";
   if (/^com\.docker/.test(evidence.name)) return "container";
   if (DEV_RUNTIMES.has(evidence.name) || evidence.ports.some((port) => port.scope === "local")) {
@@ -87,10 +96,30 @@ function kindOf(evidence: ProcessEvidence): Explanation["kind"] {
   return "unknown";
 }
 
+/** Same arithmetic as server/processes, kept here so the rules stay runtime-neutral. */
+function lifetimeOf(evidence: ProcessEvidence): number | null {
+  const { cpuSeconds, elapsedSeconds } = evidence;
+  if (cpuSeconds === null || elapsedSeconds === null || elapsedSeconds <= 0) return null;
+  return (cpuSeconds / elapsedSeconds) * 100;
+}
+
+/**
+ * Below a quarter of the current rate, most of the process's life was spent
+ * near idle: whatever it is doing now started recently. Above it, the current
+ * rate is roughly how it always runs.
+ */
+const BURST_RATIO = 0.25;
+
 function stateOf(evidence: ProcessEvidence): Explanation["state"] {
   const young = evidence.elapsedSeconds !== null && evidence.elapsedSeconds < 180;
   if (young && evidence.cpuPercent > 40) return "just-started";
-  if (evidence.cpuPercent > 50 && !young) return "sustained-load";
+  if (evidence.cpuPercent > 50 && !young) {
+    // The snapshot says busy; only the lifetime says for how long. Uptime alone
+    // would call a three-day-old Finder that woke an hour ago "three days of load".
+    const lifetime = lifetimeOf(evidence);
+    if (lifetime !== null && lifetime < evidence.cpuPercent * BURST_RATIO) return "recent-burst";
+    return "sustained-load";
+  }
   if (evidence.memoryBytes > GB && evidence.cpuPercent < 5) return "memory-heavy";
   return "steady";
 }
@@ -119,6 +148,15 @@ export function classify(evidence: ProcessEvidence): Explanation {
   if (evidence.parents.length > 0) {
     findings.push(`It was started by ${evidence.parents[0].name}.`);
   }
+  const agent = evidence.agent;
+  if (agent) {
+    const name = agent.title ? `"${agent.title}" (${agent.provider})` : `a ${agent.provider} agent`;
+    findings.push(
+      agent.inTree
+        ? `It belongs to the agent ${name}.`
+        : `It belongs to the agent ${name} but has left that agent's process tree, so ending the agent will not stop it.`,
+    );
+  }
   if (evidence.children.length > 0) {
     findings.push(
       `It has ${evidence.children.length} child process${evidence.children.length === 1 ? "" : "es"}, so quitting it takes them too.`,
@@ -130,6 +168,16 @@ export function classify(evidence: ProcessEvidence): Explanation {
 
   findings.push(`Right now: ${evidence.cpuPercent.toFixed(1)}% CPU and ${size(evidence.memoryBytes)} of memory.`);
 
+  const lifetime = lifetimeOf(evidence);
+  if (lifetime !== null && state === "recent-burst" && evidence.cpuSeconds !== null) {
+    const ceiling = evidence.cpuSeconds / (evidence.cpuPercent / 100);
+    findings.push(
+      `Over its whole life it averaged ${lifetime.toFixed(0)}% CPU. All the CPU time it has used, spent at today's rate, comes to at most ${formatDuration(ceiling)}, so it cannot have been this busy for longer than that.`,
+    );
+  } else if (lifetime !== null && state === "sustained-load") {
+    findings.push(`It has averaged ${lifetime.toFixed(0)}% over its whole life, so this is how it runs, not a spike.`);
+  }
+
   let headline: string;
   let concern: Explanation["concern"] = "none";
 
@@ -139,6 +187,21 @@ export function classify(evidence: ProcessEvidence): Explanation {
   } else if (state === "just-started") {
     headline = `${evidence.name} has only just started — this is startup work, not a stuck process.`;
     advice.push("Give it a minute and look again before doing anything.");
+  } else if (state === "recent-burst") {
+    headline = `${evidence.name} became busy recently; for most of its life it was close to idle.`;
+    concern = "watch";
+    advice.push("Look again in a few minutes before acting: a burst that ends on its own needs nothing.");
+    if (kind === "apple-system") {
+      advice.push(
+        known?.trigger
+          ? `If it stays busy, look for what triggered it — usually ${known.trigger}.`
+          : "If it stays busy, look for what triggered it; system components work when something asked them to.",
+      );
+    } else if (kind === "agent-spawned") {
+      advice.push("It belongs to one of your coding agents, so the burst is likely that agent's current task.");
+    } else {
+      advice.push("If it stays busy, quit it the normal way; terminate it from this list only if that does not work.");
+    }
   } else if (state === "sustained-load" && kind === "apple-system") {
     headline = `${evidence.name} has been busy for a while; it is a macOS component, not something to kill.`;
     concern = "watch";
@@ -152,7 +215,11 @@ export function classify(evidence: ProcessEvidence): Explanation {
     headline = `${evidence.name} has held ${evidence.cpuPercent.toFixed(0)}% CPU well past startup.`;
     concern = evidence.cpuPercent > 80 ? "act" : "watch";
     if (kind === "agent-spawned") {
-      advice.push("It belongs to one of your coding agents — closing that session releases it.");
+      advice.push(
+        agent && !agent.inTree
+          ? "It outlived its place under the agent, so stop it here rather than by closing the agent."
+          : "It belongs to one of your coding agents — closing that session releases it.",
+      );
     }
     if (evidence.ports.length > 0) {
       advice.push(`It is serving ${evidence.ports.map((port) => `:${port.port}`).join(", ")}; stop that dev server if you are not using it.`);
@@ -178,9 +245,10 @@ export function classify(evidence: ProcessEvidence): Explanation {
       `The machine is swapping (${size(evidence.machine.swapUsedBytes)} in use), so memory is the tighter constraint right now, not CPU.`,
     );
   }
-  if (evidence.machine.loadPercent < 60 && state === "sustained-load") {
+  const usage = evidence.machine.usagePercent;
+  if (usage !== null && usage < 60 && state === "sustained-load") {
     findings.push(
-      `The machine overall is not saturated (${evidence.machine.loadPercent.toFixed(0)}% of ${evidence.machine.cores} cores), so this one process is the outlier rather than a general overload.`,
+      `The machine overall is not saturated (${usage.toFixed(0)}% of ${evidence.machine.cores} cores busy), so this one process is the outlier rather than a general overload.`,
     );
   }
 

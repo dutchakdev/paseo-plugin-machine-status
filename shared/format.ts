@@ -37,3 +37,22 @@ export function clampPercent(value: number | null): number {
   if (value === null || !Number.isFinite(value)) return 0;
   return Math.max(0, Math.min(100, value));
 }
+
+/**
+ * Load averages range from 0.04 on an idle machine to hundreds on a swamped one,
+ * so the precision follows the size: two decimals where they mean something,
+ * none where they would only add noise.
+ */
+export function formatLoad(value: number): string {
+  if (!Number.isFinite(value) || value < 0) return "—";
+  if (value < 10) return value.toFixed(2);
+  if (value < 100) return value.toFixed(1);
+  return value.toFixed(0);
+}
+
+/** `ps` %CPU as cores: 100% is one core, so 1,070% reads "10.7 cores". */
+export function formatCores(cpuPercent: number): string {
+  if (!Number.isFinite(cpuPercent) || cpuPercent < 0) return "—";
+  const cores = cpuPercent / 100;
+  return `${cores.toFixed(1)} ${cores.toFixed(1) === "1.0" ? "core" : "cores"}`;
+}

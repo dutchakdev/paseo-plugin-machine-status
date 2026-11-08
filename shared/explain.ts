@@ -4,7 +4,7 @@ import { z } from "zod";
 export const ExplanationSchema = z.object({
   headline: z.string(),
   kind: z.enum(["apple-system", "agent-spawned", "container", "dev-runtime", "user-app", "unknown"]),
-  state: z.enum(["just-started", "sustained-load", "memory-heavy", "steady"]),
+  state: z.enum(["just-started", "recent-burst", "sustained-load", "memory-heavy", "steady"]),
   concern: z.enum(["none", "watch", "act"]),
   findings: z.array(z.string()),
   advice: z.array(z.string()),

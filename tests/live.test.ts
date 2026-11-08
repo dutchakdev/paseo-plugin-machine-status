@@ -11,8 +11,10 @@ import {
 } from "../shared/contracts";
 import { readMetricsHandler } from "../server/metrics";
 import { killProcessHandler, listProcessesHandler } from "../server/processes";
+import { attributeCpuHandler } from "../server/attribution";
 import { readServicesHandler } from "../server/services";
 import { readServices } from "../shared/services";
+import { attributeCpu } from "../shared/attribution";
 
 /**
  * Live checks against the machine running the suite. They never mutate anything:
@@ -34,6 +36,19 @@ describeMac("readMetricsHandler", () => {
     expect(metrics.cpu.cores).toBeGreaterThan(0);
     expect(metrics.cpu.loadAvg1).toBeGreaterThanOrEqual(0);
     expect(metrics.cpu.loadPercent).toBeGreaterThanOrEqual(0);
+  });
+
+  it("measures utilisation within 0–100, per core and overall", async () => {
+    const { cpu } = await readMetricsHandler();
+    expect(cpu.usagePercent).not.toBeNull();
+    expect(cpu.usagePercent!).toBeGreaterThanOrEqual(0);
+    expect(cpu.usagePercent!).toBeLessThanOrEqual(100);
+    expect(cpu.coreUsagePercent).toHaveLength(cpu.cores);
+    for (const core of cpu.coreUsagePercent) {
+      if (core !== null) expect(core).toBeLessThanOrEqual(100);
+    }
+    expect(cpu.windowMs).toBeGreaterThan(0);
+    expect(cpu.coreKinds).toHaveLength(cpu.coreUsagePercent.length);
   });
 
   it("reports disk usage inside a sane range", async () => {
@@ -159,6 +174,30 @@ describeMac("handler output matches its contract", () => {
   });
 });
 
+
+describeMac("attributeCpuHandler", () => {
+  const context = {
+    paseo: { agents: { list: async () => ({ agents: [] }) } },
+  } as unknown as Parameters<typeof attributeCpuHandler>[1];
+
+  it("returns what its contract declares", async () => {
+    const result = await attributeCpuHandler({}, context);
+    expect(() => attributeCpu.output.parse(result)).not.toThrow();
+  });
+
+  it("puts every process in exactly one group", async () => {
+    const { groups } = await attributeCpuHandler({}, context);
+    const counted = groups.reduce((sum, group) => sum + group.processCount, 0);
+    const listed = (await listProcessesHandler({ sortBy: "cpu", limit: 50 })).items.length;
+    expect(counted).toBeGreaterThanOrEqual(listed);
+    expect(new Set(groups.map((group) => group.id)).size).toBe(groups.length);
+  });
+
+  it("files launchd under macOS", async () => {
+    const { groups } = await attributeCpuHandler({}, context);
+    expect(groups.find((group) => group.id === "system")?.processCount ?? 0).toBeGreaterThan(0);
+  });
+});
 
 describeMac("readServicesHandler", () => {
   // The agent list is stubbed: these tests assert collection and shape, not the

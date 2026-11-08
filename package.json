@@ -23,6 +23,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "preview": "tsx scripts/preview.ts",
+    "banner": "tsx scripts/banner.ts",
     "check": "npm run typecheck && npm test"
   },
   "devDependencies": {

@@ -1,10 +1,12 @@
-<p align="center"><img src="assets/icon.png" width="88" alt=""></p>
+<p align="center">
+  <img src="docs/banner.png" alt="Machine Status for Paseo. Every core counted, every agent named. The pill beside the chat reads 99% · 66%; its card shows CPU and memory with their trend and splits the busy CPU between two agents, Paseo, macOS and other processes; an agent reads the same through machine_status." width="920">
+</p>
 
 <h1 align="center">paseo-plugin-machine-status</h1>
 
 <p align="center">
-  What the machine behind your agents is actually doing, inside <a href="https://paseo.sh">Paseo</a>.<br>
-  Load, memory, disk and battery; what is listening on the network and which agent started it;<br>
+  What the machine behind your agents is doing, and which agent is doing it, inside <a href="https://paseo.sh">Paseo</a>.<br>
+  CPU, memory, disk and battery; the cores each agent keeps busy; what listens on the network and who started it;<br>
   Docker; and the caches and runaway processes you can clear without leaving the app.
 </p>
 
@@ -17,11 +19,7 @@
   <img src="https://img.shields.io/badge/license-MIT-9aa1a6" alt="MIT licensed">
 </p>
 
-<p align="center">
-  <img src="docs/screenshot.png" alt="The Machine screen in the Paseo desktop app: CPU, memory, swap and disk tiles, load and memory history, disk and swap, and the top processes" width="920">
-</p>
-
-One sidebar item, three tabs, and a pill beside the message box.
+One sidebar item, three tabs, a pill beside the message box, and two tools your agents can call.
 
 > Requires macOS. Metrics come from `vm_stat`, `sysctl`, `df`, `pmset` and
 > `memory_pressure`. On any other platform the panel reports that it cannot
@@ -74,25 +72,24 @@ open straight on that tab, and the tab travels in the screen's link (`?tab=servi
 
 ```mermaid
 flowchart LR
-  subgraph client["Paseo app — client/"]
-    S["status: KPI tiles · charts · cleanup · processes"]
-    V["charts: bars, stacks, meters (Views only)"]
+  subgraph app["Paseo app: client/"]
+    S["Machine screen: tiles, charts, cores, processes"]
+    PC["Pill and its card"]
   end
-  subgraph shared["shared/"]
-    Z["Zod contracts"]
-    P["validated palette + geometry"]
+  subgraph agents["Agents on Paseo 0.14+"]
+    T["machine_status · machine_explain_process"]
   end
-  subgraph server["Daemon subprocess — server/"]
-    M["metrics + rolling history"]
-    C["cleanup"]
-    R["processes"]
+  subgraph server["Daemon subprocess: server/"]
+    M["metrics: tick-counter CPU, memory, disk"]
+    A["attribution: CPU by agent"]
+    E["explain: one process, with evidence"]
+    R["processes · cleanup · services · docker"]
   end
-  OS["vm_stat · df · pmset · ps · du · fs.rm · kill"]
+  OS["os.cpus · ioreg · vm_stat · ps -E · lsof · docker"]
 
-  S --> V --> P
-  S -- "useRpc(contract, input)" --> Z
-  Z -- "validated both ways" --> M & C & R
-  M & C & R --> OS
+  S & PC -- "Zod RPC, validated both ways" --> M & A & E & R
+  T -- "agent.session_open hook" --> M & A & E
+  M & A & E & R --> OS
 ```
 
 **Overview** — top to bottom: a header with a live indicator and a **Pause**
@@ -107,8 +104,8 @@ while you are looking at the overview.
 ## The pill above the composer
 
 The dashboard answers "what is this machine doing" when you go and ask. The pill
-answers it without being asked: two percentages sitting beside the message box,
-CPU load and memory pressure, its icon coloured by whichever of the two is worse.
+answers it without being asked: two percentages beside the message box, CPU in
+use and memory pressure, its icon coloured by whichever of the two is worse.
 
 Those are the two numbers that move while an agent works, and they fail in
 different ways — one saturates, the other swaps — so both are shown. The colour
@@ -120,15 +117,33 @@ One poll every ten seconds feeds every open agent's pill at once. Paseo draws
 the label, so the numbers reach each pill through its `update`; the icon is the
 plugin's own and takes the warning colour when either reading turns serious.
 Pressing the pill opens a compact card instead of leaving the chat: both
-readings with their recent trend and their severity in words, the three
-processes using the most CPU right now, and any development ports held by an
-agent or by a process an agent started. **Open Machine** at the bottom leads to
+readings with their recent trend and their severity in words, who the busy CPU
+belongs to, the three processes using the most CPU right now, and any
+development ports held by an agent or by a process an agent started. **Open Machine** at the bottom leads to
 the full tab. On a phone the card is a bottom sheet.
 
 ## Reading the dashboard
 
-**CPU** shows load average, not utilisation. The bar treats one runnable thread
-per core as 100%, so a sustained bar above full width means work is queueing.
+**CPU** is utilisation: the share of time the cores spent busy, from the
+kernel's own tick counters (`os.cpus()`, which reads `host_processor_info`), the
+figure Activity Monitor and `top` show. It cannot pass 100%. Load average sits
+under it as threads per core, because load counts threads waiting for a core
+too: on 2026-11-08 it read 659 on 8 cores, which the pill used to print as
+"6337%".
+
+The first read opens a 250 ms window of its own. After that each read measures
+the time since the previous one, so the 3 s and 10 s polls cost nothing extra;
+a read more than 15 s after the last opens a fresh window.
+
+Tap the CPU tile for one bar per core. On Apple Silicon the bars split into
+efficiency and performance cores, as `ioreg` labels them, and a line under them
+reads the pattern:
+
+| Pattern | Meaning |
+| ------- | ------- |
+| One or two cores pinned, the rest idle | The slow step runs on one thread; more cores would not help it |
+| Only efficiency cores busy | macOS background work (Spotlight, backups); your foreground work keeps the performance cores |
+| Every core busy | More work than cores; everything waits its turn |
 
 **Memory** follows Activity Monitor's split rather than "free vs used":
 
@@ -146,9 +161,39 @@ kernel gives them back on demand, so counting them as consumed is misleading.
 **Thermal** reads "Not reported" on a healthy machine — macOS records a level only
 once it has throttled something. That is honest rather than a failure.
 
-**Per-core utilisation is absent** on purpose. It needs `host_processor_info`, a
-native call macOS does not expose through any unprivileged shell tool, so the CPU
-detail says so instead of estimating.
+## Who is using the CPU
+
+The card and the Overview split the busy CPU into each agent, Paseo itself,
+macOS and other processes, in cores (`ps` %CPU / 100).
+
+```mermaid
+flowchart TD
+  P["busy process"] --> ENV{"PASEO_AGENT_ID in its environment?"}
+  ENV -- "yes, and Paseo lists that agent" --> AG["that agent"]
+  ENV -- "no" --> UP{"an ancestor carries one?"}
+  UP -- "yes" --> AG
+  UP -- "no" --> PS{"under the daemon or Paseo.app?"}
+  PS -- "yes" --> PA["Paseo"]
+  PS -- "no" --> SYS{"binary under /System, /usr/libexec, /usr/sbin, /sbin?"}
+  SYS -- "yes" --> MAC["macOS"]
+  SYS -- "no" --> OT["Other"]
+```
+
+Paseo starts every agent with `PASEO_AGENT_ID` set, and everything the agent
+starts inherits it. That catches what the process tree loses: helpers an agent
+started with `nohup` or as a daemon, now children of launchd. On the machine this
+was built on, 143 such processes carried an agent's id, some of them 78 days old.
+
+Two cases need care, and the tests pin both:
+
+- A daemon started from an agent's terminal passes that agent's id to every
+  plugin host. The plugin ignores the id it inherited itself.
+- Paseo may start an agent through a launcher called `node`, which binary-name
+  matching cannot pair with `claude`. The id names the agent exactly.
+
+`ps -wwE` prints the whole environment, secrets included. The plugin keeps the
+agent id from each line and drops the rest in the daemon subprocess; nothing else
+is stored, logged or sent to the app.
 
 ## History and the charts
 
@@ -170,7 +215,7 @@ a documented anti-pattern.
 ### Colour
 
 <p align="center">
-  <img src="docs/preview.png" alt="The dashboard drawn from sample data: KPI tiles, a load history chart, memory breakdown and disk usage" width="920">
+  <img src="docs/preview.png" alt="The dashboard drawn from sample data: KPI tiles, a CPU usage chart, memory breakdown and disk usage" width="920">
 </p>
 
 <p align="center"><sub>Generated by <code>npm run preview</code> from sample data and the plugin&apos;s own palette, thresholds and chart geometry, so the colours cannot drift from the code.</sub></p>
@@ -249,8 +294,10 @@ on a stock macOS install. The signal used instead is structural:
 
 1. Paseo starts each agent as a **direct child of the daemon**, and the plugin's
    own parent *is* the daemon — so `process.ppid` gives the root for free.
-2. Each daemon child is confirmed against `paseo.agents.list()`: the binary must
-   match the provider **as a whole word**, and the process's `cwd` (read through
+2. Each daemon child is confirmed against `paseo.agents.list()`, by the
+   `PASEO_AGENT_ID` in its environment first (see
+   [Who is using the CPU](#who-is-using-the-cpu)). A child without one must match
+   the provider's binary **as a whole word**, and its `cwd` (read through
    `lsof -d cwd`) must match the agent's. Anything else under the daemon —
    `esbuild`, Paseo's helpers, this plugin — is left out.
 3. `cwd` also tells two agents of the same provider apart, which is the ordinary
@@ -335,6 +382,12 @@ The list refreshes every five seconds and pauses while a process is selected —
 list that reorders under your finger is how the wrong PID gets terminated. Each
 row carries a CPU bar scaled to the heaviest process on screen.
 
+**AVG** is the process's CPU time over its whole life (`ps -o time,etime`). Far
+below the CPU column, it says the process became busy recently. Finder read 99%
+with an AVG of 5% after three days up, so it could not have been busy for more
+than four of those hours. **Explain** uses the same arithmetic and says so in
+words instead of reading uptime as load.
+
 Paseo and its parent processes are greyed out and marked `protected`. The plugin
 walks its own parent chain to build that set and recomputes it from a fresh `ps`
 on every kill, so a stale or forged PID from the client cannot get through.
@@ -343,6 +396,22 @@ SIGTERM is sent first and the result is reported honestly: a process that ignore
 it is reported as still running, and force kill becomes a separate, separately
 confirmed step.
 
+## For agents
+
+On Paseo 0.14 and newer every agent gets two read-only tools. Older daemons send
+no tool list, and the plugin adds nothing there.
+
+| Tool | Returns |
+| ---- | ------- |
+| `machine_status` | CPU in use, load, the core pattern, memory pressure, disk, the cores the calling agent's processes use, who else uses the CPU, and one line of guidance: hold off parallel work, memory is tight, or there is headroom |
+| `machine_explain_process` | The Explain verdict for one PID: what it is, which agent started it, burst or steady, what to do |
+
+Ask an agent to call `machine_status` before a large build or test run, or tell it
+so in your project instructions. The tools reach the agent through the
+`agent.session_open` hook, which can stop an agent from starting if it throws.
+This one cannot: any error inside it returns the request untouched, and the agent
+starts without the tools.
+
 ## Development
 
 ```bash
@@ -350,10 +419,13 @@ npm run check                         # typecheck, then the tests
 paseo plugin reload machine-status    # source edits need an explicit reload
 paseo plugin logs machine-status
 npm run preview                       # regenerates docs/preview.svg from the real palette
-./scripts/preview-png.sh              # renders it to docs/preview.png for the plugin directory
+npm run banner                        # regenerates docs/banner.svg, the README's opening image
+./scripts/preview-png.sh [banner]     # renders docs/preview.svg (or banner.svg) to PNG at 2x
 ```
 
-Tests cover the command-output parsers against captured real output, the path and
+Tests cover the command-output parsers against captured real output (including
+`os.cpus()` tick pairs, `ioreg` core clusters and `ps -E` lines with the
+environment trimmed to harmless keys), the path and
 PID guards, the rolling history buffer, the palette and chart geometry, the
 port parsers against captured `netstat`/`lsof`/`docker` output, the agent-matching
 rules including the real false positives above, and a
@@ -384,7 +456,10 @@ fallback stays in the code until it is removed on its own:
 Both paths register under the id `main`, so saved `/plugin/machine-status/main`
 links open the same screen after an upgrade. `tests/compat.test.ts` pins both
 paths, including a half-present API, which falls back rather than mixing the two.
-The daemon half uses only `server.handle`, which has not changed since 0.8.
+The daemon half uses `server.handle`, unchanged since 0.8, and `server.before`
+for the agent tools. The tool shape is mirrored in `server/agent-tools.ts`, so it
+builds against the 0.11 SDK, and the tools appear only when the session-open
+request carries a `tools` list, which Paseo sends from 0.14.
 
 Releases are cut from tags by GitHub Actions; see [CONTRIBUTING.md](CONTRIBUTING.md)
 for the flow and [CHANGELOG.md](CHANGELOG.md) for what changed.
@@ -398,6 +473,8 @@ for the flow and [CHANGELOG.md](CHANGELOG.md) for what changed.
 | Charts look empty | History starts empty; it fills as the tab stays open |
 | A port shows "another user" | It belongs to root or another account; `lsof` cannot inspect it unprivileged |
 | No agent attribution | `paseo.agents.list()` failed — the note under the service list says so |
+| An agent's CPU shows under Paseo | The daemon was started from that agent's terminal, so its id is the one every plugin inherits and proves nothing; restart the daemon from the app |
+| Agents have no `machine_status` | The daemon is older than 0.14, or Paseo's tools are off for agents: `paseo daemon config set daemon.mcp.injectIntoAgents true` |
 | A port you expected is missing | It was classified as a system port; use **Show system** |
 | Docker containers missing | Docker is not installed or not running; the note says so |
 | A cache shows "not present" | The tool is not installed, or it moved its cache |

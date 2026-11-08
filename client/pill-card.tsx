@@ -2,12 +2,14 @@ import { useRpc, type PluginButtonContentProps } from "@getpaseo/plugin/client";
 import { useQuery } from "@tanstack/react-query";
 import React, { useMemo } from "react";
 import { StyleSheet, Text, View, type TextStyle } from "react-native";
+import { attributeCpu } from "../shared/attribution";
 import { listProcesses, readMetrics } from "../shared/contracts";
-import { formatBytes, formatPercent } from "../shared/format";
+import { formatBytes, formatLoad, formatPercent } from "../shared/format";
 import { agentPorts, cpuSeverity, memorySeverity } from "../shared/pill";
 import { readServices } from "../shared/services";
 import { paletteFor, SEVERITY_LABEL, STATUS, takeLast, type Severity } from "../shared/viz";
 import { Sparkbars } from "./charts";
+import { CpuOwners } from "./owners";
 import { ActionButton, useChromeStyles, type Chrome } from "./ui";
 
 /** Enough samples to read a trend in a card a few hundred points wide. */
@@ -18,8 +20,9 @@ const TABULAR: TextStyle = { fontVariant: ["tabular-nums"] };
  * The pill's popover: more than the two numbers, far less than the tab.
  *
  * It answers "is the machine the reason this feels slow" at a glance: both
- * readings with their recent trend, what is using the CPU right now, and which
- * development ports agents have left listening. Everything else is one press
+ * readings with their recent trend, which agents the busy CPU belongs to, what
+ * is using the CPU right now, and which development ports agents have left
+ * listening. Everything else is one press
  * away in the Machine tab.
  *
  * Metrics and services share their query keys with the tab, so a card opened
@@ -43,6 +46,12 @@ export function createMachineCard(openMachine: () => void) {
       queryFn: () => top({ sortBy: "cpu", limit: 3 }),
       refetchInterval: 5_000,
     });
+    const attribute = useRpc(attributeCpu);
+    const owners = useQuery({
+      queryKey: ["machine-status", "attribution", host.id],
+      queryFn: () => attribute({}),
+      refetchInterval: 5_000,
+    });
     const scan = useRpc(readServices);
     const services = useQuery({
       queryKey: ["machine-status", "services", host.id],
@@ -51,7 +60,7 @@ export function createMachineCard(openMachine: () => void) {
     });
 
     const history = metrics.data?.history ?? [];
-    const cpuSeries = useMemo(() => takeLast(history.map((sample) => sample.cpuLoadPercent), SLOTS), [history]);
+    const cpuSeries = useMemo(() => takeLast(history.map((sample) => sample.cpuUsagePercent ?? 0), SLOTS), [history]);
     const pressureSeries = useMemo(
       () => takeLast(history.map((sample) => sample.pressurePercent ?? 0), SLOTS),
       [history],
@@ -95,9 +104,9 @@ export function createMachineCard(openMachine: () => void) {
           chrome={chrome}
           label="CPU"
           color={palette.series[0]}
-          value={formatPercent(data.cpu.loadPercent)}
-          severity={cpuSeverity(data.cpu.loadPercent)}
-          detail={`load ${data.cpu.loadAvg1.toFixed(2)} · ${data.cpu.cores} cores`}
+          value={formatPercent(data.cpu.usagePercent)}
+          severity={cpuSeverity(data.cpu.usagePercent)}
+          detail={`load ${formatLoad(data.cpu.loadAvg1)} · ${data.cpu.cores} cores`}
           series={cpuSeries}
         />
         <Reading
@@ -109,6 +118,16 @@ export function createMachineCard(openMachine: () => void) {
           detail={`${formatBytes(data.memory.appBytes)} app · swap ${formatBytes(data.swap.usedBytes)}`}
           series={pressureSeries}
         />
+
+        {owners.data ? (
+          <>
+            {divider}
+            <View style={{ gap: 4 }}>
+              <Text style={styles.muted}>Who is using the CPU</Text>
+              <CpuOwners chrome={chrome} palette={palette} data={owners.data} agentLimit={3} />
+            </View>
+          </>
+        ) : null}
 
         {divider}
         <View style={{ gap: 4 }}>
