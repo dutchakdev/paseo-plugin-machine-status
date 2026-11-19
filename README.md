@@ -113,7 +113,8 @@ follows the worse one, because a pill has room for a single colour and you need
 to know something is wrong before you need to know which one. A number that
 cannot be read shows as `—` rather than as zero.
 
-One poll every ten seconds feeds every open agent's pill at once. Paseo draws
+One poll every ten seconds feeds every open agent's pill at once. A background
+agent (Paseo 0.16) opens no tab, so it gets no pill. Paseo draws
 the label, so the numbers reach each pill through its `update`; the icon is the
 plugin's own and takes the warning colour when either reading turns serious.
 Pressing the pill opens a compact card instead of leaving the chat: both
@@ -180,7 +181,8 @@ flowchart TD
 ```
 
 Paseo starts every agent with `PASEO_AGENT_ID` set, and everything the agent
-starts inherits it. That catches what the process tree loses: helpers an agent
+starts inherits it. The plugin asks Paseo for background agents too, which its
+default list leaves out. That catches what the process tree loses: helpers an agent
 started with `nohup` or as a daemon, now children of launchd. On the machine this
 was built on, 143 such processes carried an agent's id, some of them 78 days old.
 

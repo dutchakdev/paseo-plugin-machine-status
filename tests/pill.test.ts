@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { pillReading, agentPorts, cpuSeverity, memorySeverity } from "../shared/pill";
+import { pillReading, pillWorkspace, agentPorts, cpuSeverity, memorySeverity } from "../shared/pill";
 import type { PortRow } from "../shared/services";
 
 describe("pillReading", () => {
@@ -47,6 +47,23 @@ describe("pillReading", () => {
     expect(pillReading(28, 41).label).toBe("Machine load: CPU 28%, memory 41%");
   });
 })
+
+describe("pillWorkspace", () => {
+  it("puts the pill on the agent's workspace", () => {
+    expect(pillWorkspace({ workspaceId: "ws-1", archivedAt: null })).toBe("ws-1");
+  });
+
+  it("gives none to an agent without a composer: archived, background, or with no workspace", () => {
+    expect(pillWorkspace({ workspaceId: "ws-1", archivedAt: "2026-11-19T10:00:00Z" })).toBeNull();
+    expect(pillWorkspace({ workspaceId: "ws-1", background: true })).toBeNull();
+    expect(pillWorkspace({ workspaceId: null })).toBeNull();
+  });
+
+  it("treats an agent from a host before 0.16, which sends no flag, as in sight", () => {
+    expect(pillWorkspace({ workspaceId: "ws-1", background: false })).toBe("ws-1");
+    expect(pillWorkspace({ workspaceId: "ws-1" })).toBe("ws-1");
+  });
+});
 
 describe("shared thresholds", () => {
   it("colours the pill and its card from the same thresholds", () => {
