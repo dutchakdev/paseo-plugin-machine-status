@@ -204,6 +204,20 @@ describe("listAgents", () => {
     expect((await listAgents(paseo)).map((agent) => agent.id)).toEqual(["a", "b", "c"]);
   });
 
+  it("asks for background agents too, whose processes use the CPU all the same", async () => {
+    const asked: unknown[] = [];
+    const paseo = {
+      agents: {
+        list: async (options: unknown) => {
+          asked.push(options);
+          return { entries: [entry("helper")], pageInfo: { hasMore: false, nextCursor: null } };
+        },
+      },
+    } as never;
+    await listAgents(paseo);
+    expect(asked).toEqual([{ includeBackground: true, page: { limit: 200 } }]);
+  });
+
   it("stops when a page hands back the cursor it was asked for", async () => {
     let calls = 0;
     const paseo = {

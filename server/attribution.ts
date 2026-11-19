@@ -290,12 +290,19 @@ type AgentPage = { pageInfo?: { hasMore?: boolean; nextCursor?: string | null } 
  * ends the walk instead of looping.
  */
 export async function listAgents(paseo: Pick<PluginHandlerContext["paseo"], "agents">): Promise<AgentRef[]> {
-  let page = await paseo.agents.list({ page: { limit: PAGE_LIMIT } });
+  // The default list leaves out background agents (Paseo 0.16) and agents in
+  // background workspaces, whose processes use the CPU all the same. Paseo has
+  // known `includeBackground` since 0.12, and every daemon strips a key it does
+  // not know, so older ones answer as before. The pinned 0.11 SDK lacks its type.
+  type ListOptions = Parameters<typeof paseo.agents.list>[0];
+  const options = (cursor?: string) =>
+    ({ includeBackground: true, page: cursor ? { limit: PAGE_LIMIT, cursor } : { limit: PAGE_LIMIT } }) as ListOptions;
+  let page = await paseo.agents.list(options());
   const agents = toAgentRefs(page);
   for (let count = 1; count < MAX_PAGES; count += 1) {
     const { hasMore, nextCursor } = (page as AgentPage).pageInfo ?? {};
     if (!hasMore || !nextCursor) break;
-    const next = await paseo.agents.list({ page: { limit: PAGE_LIMIT, cursor: nextCursor } });
+    const next = await paseo.agents.list(options(nextCursor));
     if ((next as AgentPage).pageInfo?.nextCursor === nextCursor) break;
     agents.push(...toAgentRefs(next));
     page = next;

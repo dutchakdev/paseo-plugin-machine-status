@@ -10,7 +10,7 @@ import { readMetrics } from "../shared/contracts";
 import { followAgents, type DirectoryAgent } from "./agent-directory";
 import { openMachineScreen } from "./compat";
 import { createMachineCard } from "./pill-card";
-import { pillReading, type PillReading } from "../shared/pill";
+import { pillReading, pillWorkspace, type PillReading } from "../shared/pill";
 import { STATUS } from "../shared/viz";
 
 /** Often enough to notice a runaway agent, rarely enough to cost nothing. */
@@ -119,7 +119,8 @@ export function contributePills(client: PluginClientContext) {
   }
 
   function track(agent: DirectoryAgent) {
-    if (agent.workspaceId && !agent.archivedAt) show(agent.id, agent.workspaceId);
+    const workspaceId = pillWorkspace(agent);
+    if (workspaceId) show(agent.id, workspaceId);
     else hide(agent.id);
   }
 

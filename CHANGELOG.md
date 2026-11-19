@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Background agents (Paseo 0.16) and agents in background workspaces count in **Who is using the CPU** and in port attribution. Paseo's default agent list leaves them out, so their processes showed under Paseo or Other processes.
+- A background agent gets no load pill: it opens no tab, so it has no composer to show one in.
+
+### Changed
+
+- Paseo 0.16 and 0.17 checked: their daemons load the plugin, and it typechecks and passes its tests against their SDKs. The one breaking change in 0.16, the removed `agent.turn.after.timeline` field, is one this plugin never read.
+- Development toolchain updated (Vite, Vitest, TanStack Query, semver).
+
 ## 0.4.0 - 2026-11-08
 
 ### Fixed

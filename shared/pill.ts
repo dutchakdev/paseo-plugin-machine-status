@@ -1,4 +1,18 @@
 import type { PortRow } from "./services";
+
+/**
+ * The workspace whose composer gets an agent's pill, or null for none. An
+ * archived agent has no composer, and neither does a background agent (Paseo
+ * 0.16), which opens no tab; older hosts send no `background` at all.
+ */
+export function pillWorkspace(agent: {
+  workspaceId?: string | null;
+  archivedAt?: string | null;
+  background?: boolean;
+}): string | null {
+  if (!agent.workspaceId || agent.archivedAt || agent.background === true) return null;
+  return agent.workspaceId;
+}
 import { severityOf, type Severity } from "./viz";
 
 export interface PillReading {

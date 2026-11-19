@@ -4,6 +4,8 @@ export interface DirectoryAgent {
   id: string;
   workspaceId?: string | null;
   archivedAt?: string | null;
+  /** Paseo 0.16 and newer: a helper with no tab. */
+  background?: boolean;
 }
 
 export interface DirectoryListener {
