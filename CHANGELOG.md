@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0 - 2026-11-24
+
+### Added
+
+- The Machine screen and composer pill work on Linux daemons. They show host
+  and per-core CPU usage, RAM, swap, disk space and available sensor readings.
+  The Overview shows CPU, memory and I/O stalls when the kernel exposes PSI.
+- Linux ports and processes are attributed to Paseo agents. The Docker tab
+  lists containers and supports their controls and logs. Cache cleanup covers
+  known locations in the daemon user's home.
+
+### Fixed
+
+- On macOS, ports visible to `lsof` are included even if `netstat` misses them.
+
 ## 0.4.1 - 2026-11-19
 
 ### Fixed

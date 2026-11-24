@@ -2,9 +2,10 @@ import os from "node:os";
 import path from "node:path";
 import type { PluginHandlerContext } from "@getpaseo/plugin/server";
 import type { z } from "zod";
-import { describeError, run, tryRun } from "./exec";
-import { envAgentRoots, listAgents, matchAgentRoots, readAgentIds, type AgentRef, type AgentRoot } from "./attribution";
-import { ancestorsOf, cwdOf, parsePsTable, PS_ARGS, type RawProcess } from "./processes";
+import { describeError, tryRun } from "./exec";
+import { envAgentRoots, listAgents, matchAgentRoots, ownersByPid, readAgentIds, type AgentRef, type AgentRoot } from "./attribution";
+import { DOCKER } from "./docker";
+import { ancestorsOf, cwdOf, readTable, type RawProcess } from "./processes";
 
 // Agent-root matching moved beside the CPU attribution that shares it.
 export { binaryMatchesProvider, matchAgentRoots, type AgentRoot } from "./attribution";
@@ -50,6 +51,22 @@ export function parseNetstatListeners(raw: string): Listener[] {
     listeners.push({ protocol: protocol as "tcp" | "udp", ...parsed });
   }
   return listeners;
+}
+
+export function parseSs(raw: string) {
+  const listeners: Listener[] = [];
+  const sockets: LsofSocket[] = [];
+  for (const line of raw.split("\n")) {
+    const row = /^\s*(tcp|udp)\s+(LISTEN|UNCONN)\s+\d+\s+\d+\s+(\S+)\s+\S+\s*(.*)$/.exec(line);
+    if (!row) continue;
+    const address = parseLsofAddress(row[3]);
+    if (!address) continue;
+    const listener = { protocol: row[1] as Listener["protocol"], ...address };
+    listeners.push(listener);
+    const owner = /"([^"]*)",pid=(\d+),/.exec(row[4]);
+    if (owner) sockets.push({ ...listener, command: owner[1], pid: Number(owner[2]) });
+  }
+  return { listeners, sockets };
 }
 
 export interface LsofSocket extends Listener {
@@ -168,29 +185,31 @@ export async function readServicesHandler(
   _input: unknown,
   context: PluginHandlerContext,
 ): Promise<Output> {
-  if (process.platform !== "darwin") {
+  const linux = process.platform === "linux";
+  if (!linux && process.platform !== "darwin") {
     throw new Error(
-      `machine-status inspects ports through macOS tools; this daemon runs on ${process.platform}.`,
+      `machine-status inspects ports on macOS and Linux; this daemon runs on ${process.platform}.`,
     );
   }
 
   const notes: string[] = [];
 
-  const [netstatTcp, netstatUdp, lsofTcp, lsofUdp, psRaw, dockerRaw] = await Promise.all([
-    tryRun("/usr/sbin/netstat", ["-an", "-p", "tcp"], 8_000),
-    tryRun("/usr/sbin/netstat", ["-an", "-p", "udp"], 8_000),
-    tryRun("/usr/sbin/lsof", ["-iTCP", "-sTCP:LISTEN", "-P", "-n", "+c", "0", "-Fpcn"], 8_000),
-    tryRun("/usr/sbin/lsof", ["-iUDP", "-P", "-n", "+c", "0", "-Fpcn"], 8_000),
-    run("/bin/ps", [...PS_ARGS], 10_000),
-    tryRun("/usr/local/bin/docker", ["ps", "--format", "{{.Names}}\t{{.Image}}\t{{.Ports}}"], 4_000),
+  const [netstatTcp, netstatUdp, lsofTcp, lsofUdp, table, dockerRaw, ssRaw] = await Promise.all([
+    linux ? null : tryRun("/usr/sbin/netstat", ["-an", "-p", "tcp"], 8_000),
+    linux ? null : tryRun("/usr/sbin/netstat", ["-an", "-p", "udp"], 8_000),
+    linux ? null : tryRun("/usr/sbin/lsof", ["-iTCP", "-sTCP:LISTEN", "-P", "-n", "+c", "0", "-Fpcn"], 8_000),
+    linux ? null : tryRun("/usr/sbin/lsof", ["-iUDP", "-P", "-n", "+c", "0", "-Fpcn"], 8_000),
+    readTable(),
+    tryRun(DOCKER, ["ps", "--format", "{{.Names}}\t{{.Image}}\t{{.Ports}}"], 4_000),
+    linux ? tryRun("ss", ["-H", "-lntup"], 8_000) : null,
   ]);
-
-  const table = parsePsTable(psRaw);
+  const ss = parseSs(ssRaw ?? "");
+  if (linux && ssRaw === null) notes.push("Listening sockets unavailable. Install iproute2 and make ss available on the daemon PATH.");
   // lsof's command column is a bare name; `ps` has the full path, and the path is
   // what separates /System/Library/... from ~/.venv/bin/python.
   const commandByPid = new Map(table.map((entry) => [entry.pid, entry.command]));
   const home = os.homedir();
-  const sockets = [
+  const sockets = linux ? ss.sockets : [
     ...parseLsofSockets(lsofTcp ?? "", "tcp"),
     ...parseLsofSockets(lsofUdp ?? "", "udp"),
   ];
@@ -211,7 +230,7 @@ export async function readServicesHandler(
   // cwd matching covers daemons that do not set it.
   const children = table.filter((entry) => entry.ppid === daemonPid);
   const inheritedId = process.env.PASEO_AGENT_ID ?? null;
-  const envIds = agents.length > 0 ? await readAgentIds(children.map((child) => child.pid)) : new Map<number, string>();
+  const envIds = agents.length > 0 ? await readAgentIds([...new Set([...children.map((child) => child.pid), ...sockets.map((socket) => socket.pid)])]) : new Map<number, string>();
   const envRoots = envAgentRoots(children, envIds, agents, inheritedId).filter((root) => !ownChain.has(root.pid));
   const claimed = new Set(envRoots.map((root) => root.id));
   const rest = children.filter((child) => !envRoots.some((root) => root.pid === child.pid));
@@ -231,6 +250,23 @@ export async function readServicesHandler(
     for (const descendant of descendants) ownerByPid.set(descendant.pid, root);
   }
 
+  const detachedPids = new Set<number>();
+  if (linux) {
+    const detached = ownersByPid({ table, envIds, agents, inheritedId });
+    const agentsById = new Map(agents.map((agent) => [agent.id, agent]));
+    for (const socket of sockets) {
+      const { pid } = socket;
+      if (ownChain.has(pid) || ownerByPid.has(pid)) continue;
+      // A listener can start after the shared process snapshot. Its own agent
+      // ID still proves ownership when the fresh socket read has a PID.
+      const id = envIds.get(pid);
+      const agent = detached.get(pid) ?? (id && id !== inheritedId ? agentsById.get(id) : undefined);
+      if (!agent) continue;
+      detachedPids.add(pid);
+      ownerByPid.set(pid, { ...agent, pid, command: commandByPid.get(pid) ?? socket.command });
+    }
+  }
+
   const containers = parseDockerPs(dockerRaw ?? "");
   const dockerByPort = new Map<number, DockerContainer>();
   for (const container of containers) {
@@ -238,9 +274,10 @@ export async function readServicesHandler(
   }
 
   // --- ports -----------------------------------------------------------------
-  const listeners = [
+  const listeners = linux ? ss.listeners : [
     ...parseNetstatListeners(netstatTcp ?? ""),
     ...parseNetstatListeners(netstatUdp ?? ""),
+    ...sockets.filter((socket) => socket.protocol === "tcp"),
   ];
   const seen = new Set<string>();
   const ports: PortRow[] = [];
@@ -259,12 +296,13 @@ export async function readServicesHandler(
     const agent = socket ? ownerByPid.get(socket.pid) : undefined;
     const container = dockerByPort.get(listener.port);
 
+    const isAgentRoot = agent?.pid === socket?.pid && !detachedPids.has(socket?.pid ?? 0);
     const attribution = agent
       ? {
-          kind: (agent.pid === socket?.pid ? "agent" : "agent-child") as "agent" | "agent-child",
+          kind: (isAgentRoot ? "agent" : "agent-child") as "agent" | "agent-child",
           label: agent.title || agent.provider,
           detail:
-            agent.pid === socket?.pid
+            isAgentRoot
               ? `${agent.provider} agent`
               : `started by the ${agent.provider} agent in ${path.basename(agent.cwd) || agent.cwd}`,
         }
@@ -300,7 +338,7 @@ export async function readServicesHandler(
 
   if (hidden > 0) {
     notes.push(
-      `${hidden} listening socket${hidden === 1 ? "" : "s"} belong to another user; run with elevated rights to attribute them.`,
+      `${hidden} listening socket${hidden === 1 ? "" : "s"} have no visible owner. This can happen when they belong to another user.`,
     );
   }
   if (dockerRaw === null) notes.push("Docker was not reachable, so containers are not listed.");
@@ -350,18 +388,19 @@ export async function readServicesHandler(
     });
   }
   for (const [pid, list] of portsByPid) {
-    if (ownerByPid.has(pid)) continue;
+    if (ownerByPid.has(pid) && !detachedPids.has(pid)) continue;
+    const detached = detachedPids.has(pid) ? ownerByPid.get(pid) : undefined;
     const socket = sockets.find((entry) => entry.pid === pid);
     if (!socket) continue;
     const command = commandByPid.get(pid) ?? socket.command;
     services.push({
       id: `listener-${pid}`,
       name: friendlyName(command),
-      subtitle: `PID ${pid}`,
+      subtitle: detached ? `started by ${detached.title || detached.provider}` : `PID ${pid}`,
       ports: [...new Set(list)].sort((a, b) => a - b),
       status: "running",
-      source: "listener",
-      relevance: classifyRelevance({ kind: "process", command, owner: "you", home }),
+      source: detached ? "agent-child" : "listener",
+      relevance: detached ? "dev" : classifyRelevance({ kind: "process", command, owner: "you", home }),
       pid,
     });
   }

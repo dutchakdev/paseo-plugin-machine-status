@@ -90,7 +90,7 @@ export function contributePills(client: PluginClientContext) {
     try {
       const metrics = await client.rpc(readMetrics, {});
       if (disposed) return;
-      const next = pillReading(metrics.cpu.usagePercent, metrics.memory.pressurePercent);
+      const next = pillReading(metrics.cpu.usagePercent, metrics.os === "linux" ? 100 - (metrics.memory.freePercent ?? 100) : metrics.memory.pressurePercent);
       store.set(next);
       for (const { registration } of pills.values()) {
         registration.update({ title: next.label, label: next.text });

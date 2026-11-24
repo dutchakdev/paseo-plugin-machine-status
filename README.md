@@ -14,16 +14,35 @@
   <a href="https://github.com/dutchakdev/paseo-plugin-machine-status/actions/workflows/ci.yml"><img src="https://github.com/dutchakdev/paseo-plugin-machine-status/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
   <a href="https://www.npmjs.com/package/paseo-plugin-machine-status"><img src="https://img.shields.io/npm/v/paseo-plugin-machine-status" alt="npm"></a>
   <img src="https://img.shields.io/badge/Paseo-0.11%2B-3987e5" alt="Supports Paseo 0.11 and newer, including betas">
-  <img src="https://img.shields.io/badge/macOS-only-9aa1a6" alt="macOS only">
+  <img src="https://img.shields.io/badge/macOS%20%7C%20Linux-9aa1a6" alt="macOS and Linux">
   <img src="https://img.shields.io/badge/dependencies-none-c98500" alt="No runtime dependencies">
   <img src="https://img.shields.io/badge/license-MIT-9aa1a6" alt="MIT licensed">
 </p>
 
 One sidebar item, three tabs, a pill beside the message box, and two tools your agents can call.
 
-> Requires macOS. Metrics come from `vm_stat`, `sysctl`, `df`, `pmset` and
-> `memory_pressure`. On any other platform the panel reports that it cannot
-> collect metrics rather than showing wrong numbers.
+## Host requirements
+
+Install the plugin on each macOS or Linux daemon and select the host on the Machine screen.
+
+On Debian and Arch-based systems such as Omarchy, the daemon needs `ps` from
+`procps` (Debian) or `procps-ng` (Arch), `getconf` from glibc, and `df` and `du`
+from coreutils. Ports & services also uses `ss` from `iproute2`. Commands must be
+on the daemon's PATH. The plugin reads counters from `/proc` and sensors from
+`/sys` using the daemon account's existing permissions.
+
+On Linux the memory tile and composer pill show used RAM, calculated as
+`MemTotal - MemAvailable`. The Overview shows swap, temperatures where
+available, and PSI for CPU, memory and I/O. The PSI values are the percentage
+of the last ten seconds during which at least one task was stalled. Per-process
+CPU uses deltas from `/proc/<pid>/stat` when a recent sample exists and falls
+back to the lifetime average from `ps` on the first read.
+
+Docker uses the CLI and context available to the daemon account. On Linux,
+the tab supports container operations and logs. The engine service itself is
+managed on the host. Developer cache cleanup covers known locations under the
+daemon user's home, including Linux defaults for Go and pip. Custom cache paths
+and redirected paths on Linux are outside the cleanup allowlist.
 
 ## Install
 
@@ -391,8 +410,7 @@ than four of those hours. **Explain** uses the same arithmetic and says so in
 words instead of reading uptime as load.
 
 Paseo and its parent processes are greyed out and marked `protected`. The plugin
-walks its own parent chain to build that set and recomputes it from a fresh `ps`
-on every kill, so a stale or forged PID from the client cannot get through.
+recomputes that set from a fresh process table before sending a signal.
 
 SIGTERM is sent first and the result is reported honestly: a process that ignores
 it is reported as still running, and force kill becomes a separate, separately
@@ -405,7 +423,7 @@ no tool list, and the plugin adds nothing there.
 
 | Tool | Returns |
 | ---- | ------- |
-| `machine_status` | CPU in use, load, the core pattern, memory pressure, disk, the cores the calling agent's processes use, who else uses the CPU, and one line of guidance: hold off parallel work, memory is tight, or there is headroom |
+| `machine_status` | CPU in use, load, the core pattern, memory pressure on macOS or used RAM and available PSI on Linux, disk, per-agent CPU and one line of guidance about available headroom |
 | `machine_explain_process` | The Explain verdict for one PID: what it is, which agent started it, burst or steady, what to do |
 
 Ask an agent to call `machine_status` before a large build or test run, or tell it
@@ -471,9 +489,9 @@ for the flow and [CHANGELOG.md](CHANGELOG.md) for what changed.
 | Symptom | Check |
 | ------- | ----- |
 | Sidebar item missing | `paseo plugin ls` reports `running`, the client is on this host, and on 0.11+ the item is not hidden in **Settings → Sidebar** |
-| "Metrics unavailable" | The daemon is not on macOS, or a `/usr/bin` tool is missing |
+| "Metrics unavailable" | Check the selected daemon OS, its PATH and access to `/proc` on Linux |
 | Charts look empty | History starts empty; it fills as the tab stays open |
-| A port shows "another user" | It belongs to root or another account; `lsof` cannot inspect it unprivileged |
+| A port shows "another user" | The daemon user cannot see the owning PID through `lsof` on macOS or `ss` on Linux |
 | No agent attribution | `paseo.agents.list()` failed — the note under the service list says so |
 | An agent's CPU shows under Paseo | The daemon was started from that agent's terminal, so its id is the one every plugin inherits and proves nothing; restart the daemon from the app |
 | Agents have no `machine_status` | The daemon is older than 0.14, or Paseo's tools are off for agents: `paseo daemon config set daemon.mcp.injectIntoAgents true` |

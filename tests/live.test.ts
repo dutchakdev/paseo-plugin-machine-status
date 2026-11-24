@@ -1,3 +1,4 @@
+import { createServer } from "node:net";
 import os from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
@@ -96,7 +97,7 @@ describeMac("listProcessesHandler", () => {
   });
 });
 
-describeMac("killProcessHandler", () => {
+describe.skipIf(!onMac && process.platform !== "linux")("killProcessHandler", () => {
   it("refuses to kill the process it is running in", async () => {
     // If the guard were broken this suite would be terminated rather than fail.
     const result = await killProcessHandler({ pid: process.pid, signal: "TERM" });
@@ -104,7 +105,7 @@ describeMac("killProcessHandler", () => {
     expect(result.error).toMatch(/Paseo itself or one of its parents/);
   });
 
-  it("refuses to kill launchd", async () => {
+  it("refuses to signal PID 1", async () => {
     const result = await killProcessHandler({ pid: 1, signal: "TERM" });
     expect(result.ok).toBe(false);
   });
@@ -206,9 +207,17 @@ describeMac("readServicesHandler", () => {
     paseo: { agents: { list: async () => ({ agents: [] }) } },
   } as unknown as Parameters<typeof readServicesHandler>[1];
 
-  it("finds the ports this machine is actually listening on", async () => {
-    const result = await readServicesHandler({}, context);
-    expect(result.ports.length).toBeGreaterThan(0);
+  it("finds a real TCP listener and attributes it to the current PID", async () => {
+    const socket = createServer().listen(0, "127.0.0.1");
+    try {
+      await new Promise<void>((resolve, reject) => socket.once("listening", resolve).once("error", reject));
+      const binding = socket.address();
+      if (!binding || typeof binding === "string") throw new Error("Expected TCP listener");
+      const result = await readServicesHandler({}, context);
+      expect(result.ports.find(({ port }) => port === binding.port)).toMatchObject({ pid: process.pid, scope: "local" });
+    } finally {
+      socket.close();
+    }
   });
 
   it("satisfies its own contract", async () => {
@@ -244,9 +253,4 @@ describeMac("readServicesHandler", () => {
     }
   });
 
-  it("reports the daemon's own listening port, which proves attribution reaches real processes", async () => {
-    const { ports } = await readServicesHandler({}, context);
-    const daemon = ports.find((port) => port.port === 6767);
-    expect(daemon?.pid).not.toBeNull();
-  });
 }, 30_000);

@@ -58,7 +58,7 @@ export function summarizeOwners(groups: readonly CpuGroup[]): OwnerSummary {
     totalPercent: Object.values(sums).reduce((sum, value) => sum + value, 0),
     segments: (Object.keys(sums) as OwnerKind[]).map((kind) => ({
       kind,
-      label: SEGMENT_LABEL[kind],
+      label: kind === "system" ? (groups.find((group) => group.kind === kind)?.label ?? SEGMENT_LABEL[kind]) : SEGMENT_LABEL[kind],
       cpuPercent: sums[kind],
     })),
     agents: agentGroups

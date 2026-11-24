@@ -1,6 +1,7 @@
 import os from "node:os";
 import type { MetricsSchema } from "../shared/contracts";
 import { alignCoreKinds, readCoreKinds, sampleCpuUsage } from "./cpu";
+import { readLinuxMetrics } from "./linux-metrics";
 import { run, tryRun } from "./exec";
 import type { z } from "zod";
 
@@ -273,9 +274,17 @@ export async function readMetricsHandler(): Promise<Metrics> {
 }
 
 async function collect(): Promise<Omit<Metrics, "history">> {
+  if (process.platform === "linux") {
+    const [usage, linux, dfRaw] = await Promise.all([
+      sampleCpuUsage(),
+      readLinuxMetrics(),
+      run("df", ["-k", "-P", "/"]),
+    ]);
+    return { ...baseMetrics(usage, new Map()), ...linux, os: "linux", disk: parseDf(dfRaw) ?? EMPTY_DISK };
+  }
   if (process.platform !== "darwin") {
     throw new Error(
-      `machine-status collects metrics through macOS tools; this daemon runs on ${process.platform}.`,
+      `machine-status collects metrics on macOS and Linux; this daemon runs on ${process.platform}.`,
     );
   }
 
@@ -291,6 +300,23 @@ async function collect(): Promise<Omit<Metrics, "history">> {
     tryRun("/usr/bin/memory_pressure", ["-Q"]),
   ]);
 
+  return {
+    ...baseMetrics(usage, kinds),
+    memory: buildMemory(
+      parseVmStat(vmStatRaw),
+      os.totalmem(),
+      pressureRaw ? parseMemoryPressure(pressureRaw) : null,
+    ),
+    swap: parseSwapUsage(swapRaw),
+    disk: parseDf(dfRaw) ?? EMPTY_DISK,
+    power: batteryRaw
+      ? parseBattery(batteryRaw)
+      : { source: "unknown", percent: null, state: null, timeRemainingMinutes: null },
+    thermal: thermalRaw ? parseThermal(thermalRaw) : { level: "unknown", cpuSpeedLimitPercent: null },
+  };
+}
+
+function baseMetrics(usage: Awaited<ReturnType<typeof sampleCpuUsage>>, kinds: Awaited<ReturnType<typeof readCoreKinds>>) {
   const cores = os.cpus().length || 1;
   const [loadAvg1, loadAvg5, loadAvg15] = os.loadavg();
 
@@ -310,16 +336,5 @@ async function collect(): Promise<Omit<Metrics, "history">> {
       coreKinds: alignCoreKinds(kinds, usage.perCore.length),
       windowMs: usage.windowMs,
     },
-    memory: buildMemory(
-      parseVmStat(vmStatRaw),
-      os.totalmem(),
-      pressureRaw ? parseMemoryPressure(pressureRaw) : null,
-    ),
-    swap: parseSwapUsage(swapRaw),
-    disk: parseDf(dfRaw) ?? EMPTY_DISK,
-    power: batteryRaw
-      ? parseBattery(batteryRaw)
-      : { source: "unknown", percent: null, state: null, timeRemainingMinutes: null },
-    thermal: thermalRaw ? parseThermal(thermalRaw) : { level: "unknown", cpuSpeedLimitPercent: null },
   };
 }

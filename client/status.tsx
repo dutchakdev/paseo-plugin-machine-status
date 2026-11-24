@@ -60,6 +60,8 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
   });
   const data = metrics.data;
   const history = data?.history ?? [];
+  const linux = data?.os === "linux";
+  const totalMemory = data?.memory.totalBytes ?? 1;
 
   // Fixed plot widths: the chart occupies the whole card and fills from the right.
   const sparkSlots = layout.compact ? 20 : 40;
@@ -69,8 +71,8 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
 
   const cpuSeries = useMemo(() => history.map((sample) => sample.cpuUsagePercent ?? 0), [history]);
   const pressureSeries = useMemo(
-    () => history.map((sample) => sample.pressurePercent ?? 0),
-    [history],
+    () => history.map((sample) => linux ? sample.appBytes * 100 / totalMemory : sample.pressurePercent ?? 0),
+    [history, linux, totalMemory],
   );
   const swapSeries = useMemo(
     () => history.map((sample) => sample.swapUsedBytes / GB),
@@ -157,14 +159,14 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
               label="MEMORY"
               labelColor={palette.series[1]}
               meta={formatBytes(data.memory.totalBytes)}
-              value={formatPercent(data.memory.pressurePercent)}
-              valueSuffix="pressure"
+              value={formatPercent(linux ? 100 - (data.memory.freePercent ?? 100) : data.memory.pressurePercent)}
+              valueSuffix={linux ? "used" : "pressure"}
               valueColor={memorySeverity === "good" ? undefined : STATUS[memorySeverity]}
               expanded={expanded === "memory"}
               onPress={() => toggle("memory")}
               footer={
                 <Text style={styles.muted}>
-                  {formatBytes(data.memory.usedBytes)} used · {SEVERITY_LABEL[memorySeverity]}
+                  {formatBytes(data.memory.usedBytes)} used{linux ? "" : ` · ${SEVERITY_LABEL[memorySeverity]}`}
                 </Text>
               }
             >
@@ -247,11 +249,11 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
           {expanded === "memory" ? (
             <DetailCard chrome={chrome} title="Memory · detail" onClose={() => setExpanded(null)}>
               {[
-                { label: "App", bytes: data.memory.appBytes, color: palette.series[0] },
+                { label: linux ? "Used RAM" : "App", bytes: data.memory.appBytes, color: palette.series[0] },
                 { label: "Wired", bytes: data.memory.wiredBytes, color: palette.series[1] },
                 { label: "Compressed", bytes: data.memory.compressedBytes, color: palette.series[2] },
                 { label: "Cached files", bytes: data.memory.cachedBytes, color: palette.neutral },
-              ].map((row) => (
+              ].filter((row) => !linux || !["Wired", "Compressed"].includes(row.label)).map((row) => (
                 <View key={row.label} style={{ gap: 4 }}>
                   <View style={styles.row}>
                     <Text style={styles.muted}>{row.label}</Text>
@@ -348,17 +350,17 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
                 <Legend
                   chrome={chrome}
                   items={[
-                    { label: "App", value: formatBytes(data.memory.appBytes), color: palette.series[0] },
+                    { label: linux ? "Used RAM" : "App", value: formatBytes(data.memory.appBytes), color: palette.series[0] },
                     { label: "Wired", value: formatBytes(data.memory.wiredBytes), color: palette.series[1] },
                     {
                       label: "Compressed",
                       value: formatBytes(data.memory.compressedBytes),
                       color: palette.series[2],
                     },
-                  ]}
+                  ].filter((row) => !linux || !["Wired", "Compressed"].includes(row.label))}
                 />
                 <Text style={styles.muted}>
-                  Headroom above the stack is unused memory · cached files{" "}
+                  {linux ? "Headroom above the stack is available RAM" : "Headroom above the stack is unused memory"} · cached files{" "}
                   {formatBytes(data.memory.cachedBytes)}
                 </Text>
               </Card>
@@ -429,6 +431,12 @@ function OverviewTab({ theme, layout, host }: PluginSurfaceProps) {
                   value={formatMinutes(data.power.timeRemainingMinutes)}
                 />
               ) : null}
+              {data.stalls ? Object.entries(data.stalls).map(([resource, value]) => value === null ? null : (
+                <MetricRow key={resource} chrome={chrome} label={`${resource.toUpperCase()} stall time · 10s`} value={formatPercent(value)} />
+              )) : null}
+              {data.thermal.temperatures?.map((sensor, index) => (
+                <MetricRow key={index} chrome={chrome} label={sensor.type} value={`${sensor.celsius.toFixed(1)} °C`} />
+              ))}
               <MetricRow
                 chrome={chrome}
                 label="Thermal"

@@ -206,7 +206,7 @@ export function DockerTab({ theme, layout, host }: PluginSurfaceProps) {
               </Text>
             </View>
 
-            {data.engine.state === "stopped" ? (
+            {data.engine.canManageService !== false && data.engine.state === "stopped" ? (
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel={`Start ${data.engine.app ?? "Docker"}`}
@@ -221,7 +221,7 @@ export function DockerTab({ theme, layout, host }: PluginSurfaceProps) {
                   {engineStarting ? "Starting…" : `Start ${data.engine.app ?? "Docker"}`}
                 </Text>
               </Pressable>
-            ) : data.engine.state === "running" ? (
+            ) : data.engine.canManageService !== false && data.engine.state === "running" ? (
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Quit the engine"

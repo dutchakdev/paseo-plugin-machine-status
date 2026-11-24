@@ -16,9 +16,9 @@ const WILDCARD = new Set(["*", "0.0.0.0", "::", "[::]"]);
  * rather than guessed from the port number.
  */
 export function scopeOf(address: string): "public" | "lan" | "local" {
-  const value = address.replace(/^\[|\]$/g, "");
+  const value = address.replace(/^\[|\]$/g, "").split("%")[0];
   if (WILDCARD.has(value)) return "public";
-  if (LOOPBACK.has(value)) return "local";
+  if (LOOPBACK.has(value) || /^127(?:\.\d{1,3}){3}$/.test(value)) return "local";
   return "lan";
 }
 

@@ -72,7 +72,7 @@ export interface MachineReportData {
     threadsPerCore: number;
     balance: BalanceVerdict;
   };
-  memory: { pressurePercent: number | null; swapUsedBytes: number; swapTotalBytes: number };
+  memory: { pressurePercent: number | null; usedBytes?: number; totalBytes?: number; swapUsedBytes: number; swapTotalBytes: number };
   disk: { usedPercent: number; freeBytes: number };
   thermal: Metrics["thermal"]["level"];
   /** The calling agent's processes; null when ownership could not be read. */
@@ -96,7 +96,9 @@ export function machineReport(
   attribution: CpuAttribution | null,
   callerId: string | null,
 ): { text: string; data: MachineReportData } {
-  const { cpu, memory, swap, disk, thermal } = metrics;
+  const { cpu, memory, swap, disk, thermal, stalls } = metrics;
+  const linux = metrics.os === "linux";
+  const usedPercent = memory.totalBytes > 0 ? memory.usedBytes * 100 / memory.totalBytes : null;
   const balance = coreBalance(cpu.coreUsagePercent, cpu.coreKinds);
   const threadsPerCore = cpu.loadAvg1 / cpu.cores;
   const kinds = balance.byKind;
@@ -122,12 +124,13 @@ export function machineReport(
 
   // --- guidance -------------------------------------------------------------
   const usage = cpu.usagePercent ?? 0;
-  const pressure = memory.pressurePercent ?? 0;
+  const pressure = (linux ? usedPercent : memory.pressurePercent) ?? 0;
+  const memoryLabel = linux ? "RAM used" : "Memory pressure";
   const busiestAgent = [...(mine ? [mine] : []), ...otherAgents].sort((left, right) => right.cpuPercent - left.cpuPercent)[0];
   const guidance: string[] = [];
   if (pressure >= 80) {
     guidance.push(
-      `Memory is tight (pressure ${formatPercent(pressure)}): avoid starting memory-heavy work such as simulators, containers or large builds.`,
+      `Memory is tight (${memoryLabel.toLowerCase()} ${formatPercent(pressure)}): avoid starting memory-heavy work such as simulators, containers or large builds.`,
     );
   }
   if (usage >= 90 || balance.verdict === "saturated") {
@@ -154,11 +157,16 @@ export function machineReport(
     `CPU ${formatPercent(cpu.usagePercent)} in use across ${cpu.cores} cores${split}; load ${formatLoad(cpu.loadAvg1)}, ${formatLoad(threadsPerCore)} runnable threads per core. ${BALANCE_TEXT[balance.verdict]}`,
   );
   lines.push(
-    `Memory pressure ${formatPercent(memory.pressurePercent)}; swap ${formatBytes(swap.usedBytes)} of ${formatBytes(swap.totalBytes)} in use.`,
+    `${memoryLabel} ${formatPercent(linux ? usedPercent : memory.pressurePercent)}; swap ${formatBytes(swap.usedBytes)} of ${formatBytes(swap.totalBytes)} in use.`,
   );
   lines.push(
-    `Disk ${formatPercent(disk.usedPercent)} used, ${formatBytes(disk.freeBytes)} free. Thermal: ${thermal.level === "unknown" ? "no throttling recorded" : thermal.level}.`,
+    `Disk ${formatPercent(disk.usedPercent)} used, ${formatBytes(disk.freeBytes)} free. Thermal: ${thermal.level === "unknown" ? (linux ? "throttling status unavailable" : "no throttling recorded") : thermal.level}.`,
   );
+  if (stalls) {
+    const readings = Object.entries(stalls).flatMap(([resource, value]) =>
+      value === null ? [] : [`${resource} ${formatPercent(value)}`]);
+    if (readings.length) lines.push(`Kernel stall time (10s): ${readings.join(", ")}.`);
+  }
   if (you) {
     lines.push(
       `Your processes: ${formatCores(mine?.cpuPercent ?? 0)}${you.top.length > 0 ? ` (${topNames(you.top, true)})` : ""}, ${you.processCount} processes.`,
@@ -186,7 +194,12 @@ export function machineReport(
         threadsPerCore,
         balance: balance.verdict,
       },
-      memory: { pressurePercent: memory.pressurePercent, swapUsedBytes: swap.usedBytes, swapTotalBytes: swap.totalBytes },
+      memory: {
+        pressurePercent: memory.pressurePercent,
+        ...(linux ? { usedBytes: memory.usedBytes, totalBytes: memory.totalBytes } : {}),
+        swapUsedBytes: swap.usedBytes,
+        swapTotalBytes: swap.totalBytes,
+      },
       disk: { usedPercent: disk.usedPercent, freeBytes: disk.freeBytes },
       thermal: thermal.level,
       you,

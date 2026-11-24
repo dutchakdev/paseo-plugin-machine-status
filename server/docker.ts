@@ -20,7 +20,7 @@ type EngineInput = z.output<typeof controlEngine.input>;
 type LogsInput = z.output<typeof readContainerLogs.input>;
 type ImageInput = z.output<typeof removeImage.input>;
 
-const DOCKER = "/usr/local/bin/docker";
+export const DOCKER = process.platform === "linux" ? "docker" : "/usr/local/bin/docker";
 const PS_FORMAT = "{{.ID}}\t{{.Names}}\t{{.Image}}\t{{.State}}\t{{.Status}}\t{{.Ports}}";
 
 /**
@@ -113,6 +113,7 @@ export function parseImages(raw: string): DockerImage[] {
 const ENGINE_APPS = ["Docker", "OrbStack", "Rancher Desktop"];
 
 async function installedApp(): Promise<string | null> {
+  if (process.platform !== "darwin") return null;
   for (const app of ENGINE_APPS) {
     if (await tryRun("/bin/test", ["-d", `/Applications/${app}.app`], 2_000).then((r) => r !== null)) {
       return app;
@@ -128,12 +129,15 @@ async function installedApp(): Promise<string | null> {
 export async function readEngine(): Promise<DockerEngine> {
   const version = await tryRun(DOCKER, ["version", "--format", "{{.Server.Version}}"], 5_000);
   const app = await installedApp();
+  const canManageService = process.platform !== "linux";
   if (version !== null && version.trim().length > 0) {
-    return { state: "running", version: version.trim(), app };
+    return { canManageService, state: "running", version: version.trim(), app };
   }
-  const cli = await tryRun("/bin/test", ["-x", DOCKER], 2_000);
-  if (app === null && cli === null) return { state: "missing", version: null, app: null };
-  return { state: "stopped", version: null, app };
+  const cli = process.platform === "linux"
+    ? await tryRun(DOCKER, ["--version"], 2_000)
+    : await tryRun("/bin/test", ["-x", DOCKER], 2_000);
+  if (app === null && cli === null) return { canManageService, state: "missing", version: null, app: null };
+  return { canManageService, state: "stopped", version: null, app };
 }
 
 export async function readDockerHandler(): Promise<ReadOutput> {
@@ -147,7 +151,9 @@ export async function readDockerHandler(): Promise<ReadOutput> {
       reason:
         engine.state === "missing"
           ? "No container engine is installed on this machine."
-          : `${engine.app ?? "The container engine"} is installed but not running.`,
+          : process.platform === "linux"
+            ? "Docker CLI found. Check the engine, context and daemon user permissions."
+            : `${engine.app ?? "The container engine"} is installed but not running.`,
       collectedAt,
       containers: [],
       images: [],
@@ -192,6 +198,7 @@ export async function readDockerHandler(): Promise<ReadOutput> {
  * has been asked and the panel polls until the daemon answers.
  */
 export async function controlEngineHandler({ action }: EngineInput) {
+  if (process.platform === "linux") return { ok: false, error: "Manage the Docker service on the Linux host." };
   const app = (await installedApp()) ?? "Docker";
   try {
     if (action === "start") {

@@ -1,3 +1,5 @@
+import fs from "node:fs/promises";
+import { performance } from "node:perf_hooks";
 import path from "node:path";
 import type { z } from "zod";
 import type { killProcess, listProcesses, ProcessSchema } from "../shared/contracts";
@@ -114,6 +116,7 @@ export function ancestorsOf(pid: number, table: readonly RawProcess[]): Set<numb
  */
 export function guardedPids(table: readonly RawProcess[], selfPid: number): Set<number> {
   const guarded = ancestorsOf(selfPid, table);
+  guarded.add(selfPid);
   guarded.add(0);
   guarded.add(1);
   return guarded;
@@ -138,6 +141,7 @@ export function parseElapsedSeconds(value: string): number | null {
 
 /** A process's working directory, or "" when lsof cannot say. */
 export async function cwdOf(pid: number): Promise<string> {
+  if (process.platform === "linux") return fs.readlink(`/proc/${pid}/cwd`).catch(() => "");
   const raw = await tryRun("/usr/sbin/lsof", ["-a", "-d", "cwd", "-p", String(pid), "-Fn"], 3_000);
   const line = raw?.split("\n").find((entry) => entry.startsWith("n"));
   return line ? line.slice(1) : "";
@@ -170,8 +174,62 @@ export function sortEntries(entries: ProcessEntry[], sortBy: "cpu" | "memory"): 
   );
 }
 
-async function readTable(): Promise<RawProcess[]> {
-  return parsePsTable(await run("/bin/ps", [...PS_ARGS], 10_000));
+export function parseLinuxProcessStat(raw: string) {
+  const fields = raw.slice(raw.lastIndexOf(")") + 2).trim().split(/\s+/);
+  const ticks = Number(fields[11]) + Number(fields[12]);
+  const started = Number(fields[19]);
+  return Number.isFinite(ticks) && Number.isFinite(started) ? { ticks, started } : null;
+}
+
+let linuxBaseline: { at: number; counters: Map<number, { ticks: number; started: number }>; table: RawProcess[] } | null = null;
+let pendingTable: Promise<RawProcess[]> | null = null;
+let clockTicks: Promise<number> | null = null;
+
+async function readLinuxTable(): Promise<RawProcess[]> {
+  if (linuxBaseline && performance.now() - linuxBaseline.at < 500) return linuxBaseline.table;
+  clockTicks ??= run("getconf", ["CLK_TCK"]).then(Number).catch(() => NaN);
+  const [raw, hz] = await Promise.all([
+    run("ps", ["-ww", "-eo", "pid=,ppid=,pcpu=,rss=,etime=,comm="], 10_000),
+    clockTicks,
+  ]);
+  const table: RawProcess[] = [];
+  const counters = new Map<number, { ticks: number; started: number }>();
+  const at = performance.now();
+  for (const batch of raw.trim().split("\n").reduce<string[][]>((batches, line, index) => {
+    if (index % 64 === 0) batches.push([]);
+    batches[batches.length - 1].push(line);
+    return batches;
+  }, [])) {
+    const entries = await Promise.all(batch.map(async (line): Promise<RawProcess | null> => {
+      const match = /^\s*(\d+)\s+(\d+)\s+([\d.]+)\s+(\d+)\s+(\S+)\s+(.+)$/.exec(line);
+      if (!match) return null;
+      const pid = Number(match[1]);
+      const [stat, executable] = await Promise.all([
+        fs.readFile(`/proc/${pid}/stat`, "utf8").then(parseLinuxProcessStat).catch(() => null),
+        fs.readlink(`/proc/${pid}/exe`).catch(() => match[6]),
+      ]);
+      const before = linuxBaseline?.counters.get(pid);
+      if (stat) counters.set(pid, stat);
+      const elapsedSeconds = parseElapsedSeconds(match[5]) ?? undefined;
+      const seconds = stat && hz > 0 ? stat.ticks / hz : undefined;
+      const windowMs = linuxBaseline ? at - linuxBaseline.at : Infinity;
+      const cpuPercent = stat && before?.started === stat.started && stat.ticks >= before.ticks &&
+        hz > 0 && windowMs <= 15_000
+        ? (stat.ticks - before.ticks) * 100_000 / (hz * windowMs)
+        : Number(match[3]);
+      return { pid, ppid: Number(match[2]), cpuPercent, memoryBytes: Number(match[4]) * 1024,
+        command: executable, cpuSeconds: seconds, elapsedSeconds };
+    }));
+    for (const entry of entries) if (entry) table.push(entry);
+  }
+  linuxBaseline = { at, counters, table };
+  return table;
+}
+
+export function readTable(): Promise<RawProcess[]> {
+  if (process.platform !== "linux") return run("/bin/ps", [...PS_ARGS], 10_000).then(parsePsTable);
+  pendingTable ??= readLinuxTable().finally(() => { pendingTable = null; });
+  return pendingTable;
 }
 
 function isAlive(pid: number): boolean {
@@ -198,7 +256,9 @@ export async function listProcessesHandler({ sortBy, limit }: ListInput): Promis
 export async function killProcessHandler({ pid, signal }: KillInput): Promise<KillOutput> {
   // The guard is recomputed from a fresh table on every call. The client's view
   // may be stale, and a PID it believes is safe may have been reused since.
-  const table = await readTable();
+  const table = process.platform === "linux"
+    ? parsePsTable(await run("ps", ["-ww", "-eo", "pid=,ppid=,pcpu=,rss=,comm="], 10_000))
+    : await readTable();
   const guarded = guardedPids(table, process.pid);
   const target = table.find((entry) => entry.pid === pid);
 
