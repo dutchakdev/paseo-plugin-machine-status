@@ -39,6 +39,7 @@ export const DockerImageSchema = z.object({
 });
 
 export const EngineSchema = z.object({
+  canManageService: z.boolean().optional(),
   /** `missing` means no engine is installed at all, not merely stopped. */
   state: z.enum(["running", "stopped", "missing"]),
   version: z.string().nullable(),

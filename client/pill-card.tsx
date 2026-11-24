@@ -60,10 +60,12 @@ export function createMachineCard(openMachine: () => void) {
     });
 
     const history = metrics.data?.history ?? [];
+    const linux = metrics.data?.os === "linux";
+    const totalMemory = metrics.data?.memory.totalBytes ?? 1;
     const cpuSeries = useMemo(() => takeLast(history.map((sample) => sample.cpuUsagePercent ?? 0), SLOTS), [history]);
     const pressureSeries = useMemo(
-      () => takeLast(history.map((sample) => sample.pressurePercent ?? 0), SLOTS),
-      [history],
+      () => takeLast(history.map((sample) => linux ? sample.appBytes * 100 / totalMemory : sample.pressurePercent ?? 0), SLOTS),
+      [history, linux, totalMemory],
     );
     const ports = useMemo(() => agentPorts(services.data?.ports ?? []), [services.data]);
 
@@ -113,9 +115,9 @@ export function createMachineCard(openMachine: () => void) {
           chrome={chrome}
           label="MEMORY"
           color={palette.series[1]}
-          value={formatPercent(data.memory.pressurePercent)}
+          value={formatPercent(linux ? 100 - (data.memory.freePercent ?? 100) : data.memory.pressurePercent)}
           severity={memorySeverity(data.memory.pressurePercent)}
-          detail={`${formatBytes(data.memory.appBytes)} app · swap ${formatBytes(data.swap.usedBytes)}`}
+          detail={`${formatBytes(data.memory.appBytes)} ${linux ? "used" : "app"} · swap ${formatBytes(data.swap.usedBytes)}`}
           series={pressureSeries}
         />
 

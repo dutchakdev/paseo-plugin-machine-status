@@ -26,6 +26,7 @@ const home = (...segments: string[]): string => path.join(os.homedir(), ...segme
  * re-download rather than data. `~/Library/Caches` as a whole is deliberately
  * absent: it also holds application state that does not regenerate.
  */
+const linux = process.platform === "linux";
 const TARGET_DEFINITIONS: readonly TargetDefinition[] = [
   {
     id: "npm",
@@ -37,7 +38,7 @@ const TARGET_DEFINITIONS: readonly TargetDefinition[] = [
     id: "pnpm",
     label: "pnpm store",
     hint: "Rebuilt on the next pnpm install",
-    candidates: [home("Library", "pnpm", "store"), home(".local", "share", "pnpm", "store"), home(".pnpm-store")],
+    candidates: [...(linux ? [] : [home("Library", "pnpm", "store")]), home(".local", "share", "pnpm", "store"), home(".pnpm-store")],
   },
   {
     id: "yarn",
@@ -73,13 +74,13 @@ const TARGET_DEFINITIONS: readonly TargetDefinition[] = [
     id: "go-build",
     label: "Go build cache",
     hint: "Next go build is a full rebuild",
-    candidates: [home("Library", "Caches", "go-build")],
+    candidates: [linux ? home(".cache", "go-build") : home("Library", "Caches", "go-build")],
   },
   {
     id: "pip",
     label: "pip cache",
     hint: "Re-downloaded on the next pip install",
-    candidates: [home("Library", "Caches", "pip")],
+    candidates: [linux ? home(".cache", "pip") : home("Library", "Caches", "pip")],
   },
   {
     id: "uv",
@@ -87,7 +88,7 @@ const TARGET_DEFINITIONS: readonly TargetDefinition[] = [
     hint: "Re-downloaded on the next uv sync",
     candidates: [home(".cache", "uv")],
   },
-];
+].filter((target) => !linux || !["yarn", "xcode-derived-data"].includes(target.id));
 
 async function exists(target: string): Promise<boolean> {
   try {
@@ -118,6 +119,9 @@ export async function assertSafePath(target: string): Promise<string> {
   if (relative === "" || relative.startsWith("..") || path.isAbsolute(relative)) {
     throw new Error(`refusing to touch ${resolved}: it is not inside the home directory`);
   }
+  if (linux && resolved !== path.join(realHome, path.relative(os.homedir(), target))) {
+    throw new Error(`refusing to touch redirected cache path ${target}`);
+  }
   if (relative.split(path.sep).filter(Boolean).length < 2) {
     throw new Error(`refusing to touch ${resolved}: too close to the home directory root`);
   }
@@ -144,6 +148,7 @@ export async function emptyDirectory(target: string): Promise<void> {
 }
 
 export async function planCleanupHandler(): Promise<PlanOutput> {
+  if (!linux && process.platform !== "darwin") return { scannedAt: new Date().toISOString(), targets: [], totalBytes: 0 };
   const targets: CleanupTarget[] = await Promise.all(
     TARGET_DEFINITIONS.map(async (definition): Promise<CleanupTarget> => {
       const resolved = await resolveCandidate(definition);
@@ -172,6 +177,7 @@ export async function planCleanupHandler(): Promise<PlanOutput> {
 }
 
 export async function applyCleanupHandler({ targetIds }: ApplyInput): Promise<ApplyOutput> {
+  if (!linux && process.platform !== "darwin") throw new Error("Developer cache cleanup requires macOS or Linux.");
   const requested = new Set(targetIds);
   const selected = TARGET_DEFINITIONS.filter((definition) => requested.has(definition.id));
 

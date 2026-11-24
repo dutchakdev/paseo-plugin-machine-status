@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import os from "node:os";
 import type { CoreKind } from "../shared/cores";
 import { tryRun } from "./exec";
@@ -121,9 +122,26 @@ export function createCpuSampler(deps: SamplerDeps, policy: SamplerPolicy = DEFA
   };
 }
 
+/** Excludes guest time (already counted in user/nice) and treats I/O wait as idle. */
+export function parseLinuxCpuTimes(raw: string): CoreTimes[] {
+  const times: CoreTimes[] = [];
+  for (const line of raw.split("\n")) {
+    if (!/^cpu\d+\s/.test(line)) continue;
+    const [user, nice, system, idle, iowait = 0, irq = 0, softirq = 0, steal = 0] =
+      line.trim().split(/\s+/).slice(1, 9).map(Number);
+    times.push({ user, nice, sys: system + steal, idle: idle + iowait, irq: irq + softirq });
+  }
+  return times;
+}
+
+function readCoreTimes(): CoreTimes[] {
+  if (process.platform === "linux") return parseLinuxCpuTimes(readFileSync("/proc/stat", "utf8"));
+  return os.cpus().map((cpu) => cpu.times);
+}
+
 /** The daemon's sampler. One per plugin process, shared by every caller. */
 export const sampleCpuUsage = createCpuSampler({
-  read: () => os.cpus().map((cpu) => cpu.times),
+  read: readCoreTimes,
   now: () => Date.now(),
   wait: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
 });

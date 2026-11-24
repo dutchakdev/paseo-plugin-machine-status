@@ -1,9 +1,10 @@
+import fs from "node:fs/promises";
 import type { PluginHandlerContext } from "@getpaseo/plugin/server";
 import type { z } from "zod";
 import type { attributeCpu, CpuGroup } from "../shared/attribution";
 import { normalizeAgents, SYSTEM_PREFIXES } from "../shared/services-classify";
-import { describeError, run, runTolerant } from "./exec";
-import { ancestorsOf, cwdOf, parsePsTable, processName, PS_ARGS, type RawProcess } from "./processes";
+import { describeError, runTolerant } from "./exec";
+import { ancestorsOf, cwdOf, processName, readTable, type RawProcess } from "./processes";
 
 type Output = z.output<typeof attributeCpu.output>;
 
@@ -198,7 +199,7 @@ const TOP = 3;
 export function groupCpu(
   table: readonly RawProcess[],
   owners: ReadonlyMap<number, AgentRef>,
-  { daemonPid, selfPid }: { daemonPid: number; selfPid: number },
+  { daemonPid, selfPid, linux = false }: { daemonPid: number; selfPid: number; linux?: boolean },
 ): CpuGroup[] {
   // Paseo is the chain this plugin runs under, minus launchd, plus everything
   // under the daemon that no agent owns: plugin hosts and their commands.
@@ -242,8 +243,10 @@ export function groupCpu(
       );
     } else if (paseo.has(entry.pid) || underDaemon(entry.pid) || entry.command.startsWith(PASEO_APP)) {
       add("paseo", () => ({ kind: "paseo", id: "paseo", label: "Paseo", detail: "daemon, app and plugins" }), entry);
-    } else if (SYSTEM_BINARIES.some((prefix) => entry.command.startsWith(prefix))) {
-      add("system", () => ({ kind: "system", id: "system", label: "macOS", detail: null }), entry);
+    } else if (linux
+      ? entry.pid === 1 || entry.pid === 2 || entry.ppid === 2
+      : SYSTEM_BINARIES.some((prefix) => entry.command.startsWith(prefix))) {
+      add("system", () => ({ kind: "system", id: "system", label: linux ? "Linux" : "macOS", detail: null }), entry);
     } else {
       add("other", () => ({ kind: "other", id: "other", label: "Other processes", detail: null }), entry);
     }
@@ -272,6 +275,17 @@ export function groupCpu(
  */
 export async function readAgentIds(pids: readonly number[]): Promise<Map<number, string>> {
   if (pids.length === 0) return new Map();
+  if (process.platform === "linux") {
+    const ids = new Map<number, string>();
+    for (let start = 0; start < pids.length; start += 64) {
+      await Promise.all(pids.slice(start, start + 64).map(async (pid) => {
+        const value = await fs.readFile(`/proc/${pid}/environ`, "utf8").catch(() => "");
+        const field = value.split("\0").find((part) => part.startsWith("PASEO_AGENT_ID="));
+        if (field) ids.set(pid, field.slice("PASEO_AGENT_ID=".length));
+      }));
+    }
+    return ids;
+  }
   return parseAgentIds(await runTolerant("/bin/ps", ["-wwE", "-o", "pid=,command=", "-p", pids.join(",")], 8_000));
 }
 
@@ -331,7 +345,7 @@ export function fallbackCandidates(
 
 export async function attributeCpuHandler(_input: unknown, context: PluginHandlerContext): Promise<Output> {
   const notes: string[] = [];
-  const table = parsePsTable(await run("/bin/ps", [...PS_ARGS], 10_000));
+  const table = await readTable();
   const daemonPid = process.ppid;
 
   let agents: AgentRef[] = [];
@@ -362,7 +376,7 @@ export async function attributeCpuHandler(_input: unknown, context: PluginHandle
   }
 
   const owners = ownersByPid({ table, envIds, agents, inheritedId, fallbackRoots });
-  const groups = groupCpu(table, owners, { daemonPid, selfPid: process.pid });
+  const groups = groupCpu(table, owners, { daemonPid, selfPid: process.pid, linux: process.platform === "linux" });
 
   return {
     collectedAt: new Date().toISOString(),

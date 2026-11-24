@@ -69,6 +69,7 @@ export const PowerSchema = z.object({
 export const ThermalSchema = z.object({
   level: z.enum(["nominal", "fair", "serious", "critical", "unknown"]),
   cpuSpeedLimitPercent: z.number().nullable(),
+  temperatures: z.array(z.object({ type: z.string(), celsius: z.number() })).optional(),
 });
 
 /** One point in the rolling history the charts draw. Kept small: it ships on every poll. */
@@ -87,6 +88,7 @@ export const MetricsSchema = z.object({
   collectedAt: z.string(),
   hostname: z.string(),
   platform: z.string(),
+  os: z.literal("linux").optional(),
   uptimeSeconds: z.number(),
   cpu: CpuSchema,
   memory: MemorySchema,
@@ -94,6 +96,7 @@ export const MetricsSchema = z.object({
   disk: DiskSchema,
   power: PowerSchema,
   thermal: ThermalSchema,
+  stalls: z.object({ cpu: z.number().nullable(), memory: z.number().nullable(), io: z.number().nullable() }).optional(),
   history: z.array(HistorySampleSchema),
 });
 

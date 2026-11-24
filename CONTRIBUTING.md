@@ -1,6 +1,6 @@
 # Contributing
 
-Machine Status is a TypeScript plugin for Paseo 0.11.0 and newer, including beta releases after 0.11.0, with a React Native client and a Node.js daemon component that reads a macOS machine. Changes should keep its readings honest: report what cannot be measured instead of estimating it.
+Machine Status is a TypeScript plugin for Paseo 0.11.0 and newer, including beta releases after 0.11.0. Its React Native client shows readings from a Node.js daemon component on macOS or Linux. Report unavailable readings explicitly.
 
 ## Development setup
 
@@ -11,7 +11,11 @@ npm ci --ignore-scripts --legacy-peer-deps
 npm run check        # typecheck, then the full test suite
 ```
 
-Parser tests run against captured real output of `vm_stat`, `df`, `ps`, `lsof`, `netstat` and `docker`. Add a capture, not a made-up string, when a parser changes. The live tests run only on macOS and never change anything: cleanup is only planned, and kill tests assert refusals.
+Parser tests use captures and targeted samples of kernel and command output.
+The live suites exercise the collectors on macOS and Linux, including a TCP
+listener the test opens and closes. Cleanup checks only produce a plan, and
+process termination tests assert refusals. Install `iproute2` on Linux so the
+live port test can use `ss`.
 
 SDK development dependencies stay pinned to 0.11.4, on the oldest release line the manifest accepts, so typechecking proves the plugin uses only the 0.11 API, which every supported release still provides. Newer APIs go through `client/compat.tsx`, which describes them locally and calls them only after checking that the connected app has them.
 
