@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.1 - 2026-11-28
+
+### Changed
+
+- Verified Machine Status with the Paseo 0.18 SDK and daemon, including Linux metrics and listening ports.
+
 ## 0.5.0 - 2026-11-24
 
 ### Added
