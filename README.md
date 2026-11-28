@@ -63,6 +63,8 @@ the `git:` prefix: `git:dutchakdev/paseo-plugin-machine-status`.
 
 The plugin supports **Paseo 0.11 and newer, including betas**, on both the
 daemon, which runs its collectors, and the app, which runs its screens.
+The Paseo 0.18.1 SDK and daemon were checked, including Linux metrics and
+listening-port discovery.
 
 The manifest asks for `>=0.11.0` because it declares the icon shown in the plugin
 directory, and Paseo 0.8 to 0.10 refuse a manifest with a field they do not know.
